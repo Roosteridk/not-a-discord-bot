@@ -33,16 +33,12 @@ export interface Component {
 }
 
 // Utility classes
-export class EphemeralResponse implements InteractionResponse {
-  type: InteractionResponseType =
-    InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE;
-  data: InteractionResponseData;
-
-  constructor(data: InteractionResponseData, type?: InteractionResponseType) {
-    this.data = data;
-    this.data.flags = MessageFlags.EPHEMERAL;
-    if (type !== undefined) {
-      this.type = type;
-    }
-  }
+export function EphemeralResponse(data: InteractionResponseData, type = InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE) {
+  return {
+    type,
+    data: {
+      ...data,
+      flags: MessageFlags.EPHEMERAL,
+    },
+  } as InteractionResponse;
 }
