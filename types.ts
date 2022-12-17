@@ -1,12 +1,40 @@
-// Description: Types for the Discord API
-export interface ApplicationCommand {
-  id: bigint;
-  type?: ApplicationCommandType;
-  application_id: bigint;
-  guild_id?: bigint;
+export interface CreateApplicationCommand {
   name: string;
+  /** Localization object for the `name` field. Values follow the same restrictions as `name` */
+  nameLocalizations?: Localization;
+  /** 1-100 character description */
   description: string;
+  /** Localization object for the `description` field. Values follow the same restrictions as `description` */
+  descriptionLocalizations?: Localization;
+  /** Type of command, defaults `ApplicationCommandTypes.ChatInput` if not set  */
+  type?: ApplicationCommandTypes;
+  /** Parameters for the command */
   options?: ApplicationCommandOption[];
+  /** Set of permissions represented as a bit set */
+  defaultMemberPermissions?: PermissionString[];
+  /** Indicates whether the command is available in DMs with the app, only for globally-scoped commands. By default, commands are visible. */
+  dmPermission?: boolean;
+}
+
+export interface Localization {
+  [key: string]: string;
+}
+
+export interface PermissionString {
+  id: bigint;
+  type: PermissionType;
+  permission: boolean;
+}
+
+export enum PermissionType {
+  ROLE = 1,
+  USER,
+}
+
+export enum ApplicationCommandTypes {
+  ChatInput = 1,
+  User,
+  Message,
 }
 
 export interface ApplicationCommandOption {

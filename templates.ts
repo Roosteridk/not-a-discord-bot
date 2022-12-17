@@ -1,5 +1,5 @@
 import {
-  ApplicationCommand,
+  CreateApplicationCommand,
   ButtonComponent,
   Interaction,
   InteractionResponse,
@@ -10,7 +10,7 @@ import {
   TextInputComponent,
 } from "./types.ts";
 
-export interface Command extends ApplicationCommand {
+export interface Command extends CreateApplicationCommand {
   name: string;
   description: string;
   exec: (
