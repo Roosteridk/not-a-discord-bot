@@ -1,4 +1,4 @@
-import Discord from "./discord.ts";
+import Discord from "./mod.ts";
 const bot = new Discord(
   Deno.env.get("DISCORD_TOKEN")!,
   Deno.env.get("DISCORD_PUBLIC_KEY")!,
