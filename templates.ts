@@ -32,7 +32,7 @@ export interface Component {
   ) => Promise<InteractionResponse>;
 }
 
-// Utility classes
+// Utility functions
 export function EphemeralResponse(data: InteractionResponseData, type = InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE) {
   return {
     type,

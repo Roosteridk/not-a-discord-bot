@@ -1,3 +1,21 @@
+export interface Application {
+  id: bigint;
+  name: string;
+  icon: string | null;
+  description: string;
+  rpc_origins?: string[];
+  bot_public: boolean;
+  bot_require_code_grant: boolean;
+  terms_of_service_url?: string;
+  privacy_policy_url?: string;
+  owner?: DiscordUser;
+  verify_key: string;
+  guild_id?: bigint;
+  primary_sku_id?: bigint;
+  slug?: string;
+  cover_image?: string;
+}
+
 export interface CreateApplicationCommand {
   name: string;
   /** Localization object for the `name` field. Values follow the same restrictions as `name` */

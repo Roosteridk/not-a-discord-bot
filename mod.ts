@@ -5,15 +5,17 @@ import {
   InteractionResponse,
   InteractionType,
   MessageComponentData,
+  InteractionResponseData
 } from "./types.ts";
 import { Command, Component } from "./templates.ts";
 import { ed25519Verify } from "https://deno.land/x/polkadot@0.2.19/util-crypto/mod.ts";
 
 export default class Discord {
   publicKey: string;
+  applicationId: bigint;
   private auth: Headers;
   private readonly discordApiUrl = "https://discord.com/api/v8/";
-  private middleware?;
+  middleware?;
   /**
    * Creates a new Discord instance
    * @param publicKey The public key of the application (found in the Discord Developer Portal)
@@ -21,9 +23,11 @@ export default class Discord {
   constructor(
     token: string,
     publicKey: string,
+    applicationId: bigint,
     middleware?: (...args: unknown[]) => Promise<unknown>,
   ) {
     this.publicKey = publicKey;
+    this.applicationId = applicationId;
     this.auth = new Headers({
       "Authorization": "Bot " + token,
     });
@@ -115,13 +119,19 @@ export default class Discord {
    * @returns The response from the Discord API
    */
   private async fetch(endpoint: string, options?: RequestInit) {
-    return await fetch(this.discordApiUrl + endpoint, {
+    const res = await fetch(this.discordApiUrl + endpoint, {
       ...options,
       headers: {
         ...this.auth,
         ...options?.headers,
       },
     });
+
+    if (!res.ok) {
+      console.error((await res.json()).message);
+      return Promise.reject("Discord API error: " + res.statusText);
+    }
+    return res;
   }
 
   /**
@@ -148,5 +158,13 @@ export default class Discord {
     });
     return await res.json();
   }
-  // TODO: Implement more methods
+  
+  async editOriginalInteractionResponse(token: string, content: InteractionResponseData) {
+    return await this.fetch(`webhooks/${this.applicationId}/${token}/messages/@original`, {
+      method: "PATCH",
+      body: JSON.stringify({
+        content,
+      }),
+    });
+  }
 }
