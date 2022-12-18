@@ -42,3 +42,10 @@ export function EphemeralResponse(data: InteractionResponseData, type = Interact
     },
   } as InteractionResponse;
 }
+
+export function ActionRow(...components: (ButtonComponent | SelectMenuComponent | TextInputComponent)[]) {
+  return {
+    type: 1,
+    components,
+  };
+}
