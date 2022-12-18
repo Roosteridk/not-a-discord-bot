@@ -3,11 +3,11 @@ import {
   Channel,
   Interaction,
   InteractionResponse,
+  InteractionResponseData,
   InteractionType,
   MessageComponentData,
-  InteractionResponseData
 } from "./types.ts";
-import { Command, Component } from "./templates.ts";
+import { Command, Component } from "./utils.ts";
 import { ed25519Verify } from "https://deno.land/x/polkadot@0.2.19/util-crypto/mod.ts";
 
 export default class Discord {
@@ -15,23 +15,20 @@ export default class Discord {
   applicationId: bigint;
   private auth: Headers;
   private readonly discordApiUrl = "https://discord.com/api/v8/";
-  middleware?;
-  /**
-   * Creates a new Discord instance
-   * @param publicKey The public key of the application (found in the Discord Developer Portal)
-   */
+
+  /** The parameters are the same as the ones in the Discord Developer Portal */
   constructor(
-    token: string,
-    publicKey: string,
-    applicationId: bigint,
-    middleware?: (i: Interaction) => Promise<unknown | InteractionResponse>,
+    { token, publicKey, applicationId }: {
+      token: string;
+      publicKey: string;
+      applicationId: bigint;
+    },
   ) {
     this.publicKey = publicKey;
     this.applicationId = applicationId;
     this.auth = new Headers({
       "Authorization": "Bot " + token,
     });
-    this.middleware = middleware;
   }
 
   /**
@@ -74,42 +71,27 @@ export default class Discord {
   }
 
   /**
-   * This maps the interaction type to the correct execution function.
-   * Might make this abstract in the future...
+   * This is the default handler for interactions which will import the command or component and execute it.
+   * You can modify this to your own needs. For example, you can add a switch case for each command or component.
    * @param i The interaction to handle
    * @returns An InteractionResponse to send back to Discord
    */
-  private async handleInteraction(
+  private handleInteraction(
     i: Interaction,
   ): Promise<InteractionResponse> {
-    let middlewareRes: unknown;
-    // Middleware can be used to intercept the interaction before it is handled
-    // This is useful for things like logging or checking permissions
-    // The result of the middleware is passed to the command or component
-    if (this.middleware !== undefined) {
-      middlewareRes = await this.middleware(i);
-    }
-    // If the middleware returns an InteractionResponse, we can just return that
-    if(middlewareRes instanceof Promise<InteractionResponse>) {
-      return middlewareRes;
-    }
-
     switch (i.type) {
       case InteractionType.APPLICATION_COMMAND:
         return import(
           `./commands/${(i.data as ApplicationCommandData).name}.ts`
-        )
-          .then((c: Command) => c.exec(i, middlewareRes));
+        ).then((c: Command) => c.exec(i));
       case InteractionType.MESSAGE_COMPONENT || InteractionType.MODAL_SUBMIT:
         return import(
           `./components/${(i.data as MessageComponentData).custom_id}.ts`
-        )
-          .then((c: Component) => c.exec(i, middlewareRes));
+        ).then((c: Component) => c.exec(i));
       case InteractionType.APPLICATION_COMMAND_AUTOCOMPLETE:
         return import(
           `./commands/${(i.data as ApplicationCommandData).name}.ts`
-        )
-          .then((c: Command) => c.autocomplete!(i, middlewareRes));
+        ).then((c: Command) => c.autocomplete!(i));
       default:
         throw new Error("Unknown interaction type");
     }
@@ -162,13 +144,27 @@ export default class Discord {
     });
     return await res.json();
   }
-  
-  async editOriginalInteractionResponse(token: string, content: InteractionResponseData) {
-    return await this.fetch(`webhooks/${this.applicationId}/${token}/messages/@original`, {
-      method: "PATCH",
-      body: JSON.stringify({
-        content,
-      }),
+
+  async editOriginalInteractionResponse(
+    token: string,
+    content: InteractionResponseData,
+  ) {
+    return await this.fetch(
+      `webhooks/${this.applicationId}/${token}/messages/@original`,
+      {
+        method: "PATCH",
+        body: JSON.stringify({
+          content,
+        }),
+      },
+    );
+  }
+  /**
+   * Adds a role to a guild member. Requires the `MANAGE_ROLES` permission.
+   */
+  async giveRole(userId: bigint, guildId: bigint, roleId: bigint) {
+    return await this.fetch(`guilds/${guildId}/members/${userId}/roles/${roleId}`, {
+      method: "PUT",
     });
   }
 }

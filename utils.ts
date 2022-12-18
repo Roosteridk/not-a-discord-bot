@@ -1,6 +1,7 @@
 import {
-  CreateApplicationCommand,
+  ActionRow,
   ButtonComponent,
+  CreateApplicationCommand,
   Interaction,
   InteractionResponse,
   InteractionResponseData,
@@ -8,8 +9,9 @@ import {
   MessageFlags,
   SelectMenuComponent,
   TextInputComponent,
-  ActionRow
 } from "./types.ts";
+
+// These are utility functions and types that you can use in your code to help you write your commands and components
 
 export interface Command extends CreateApplicationCommand {
   name: string;
@@ -33,8 +35,10 @@ export interface Component {
   ) => Promise<InteractionResponse>;
 }
 
-// Utility functions
-export function EphemeralResponse(data: InteractionResponseData, type = InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE) {
+export function EphemeralResponse(
+  data: InteractionResponseData,
+  type = InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+) {
   return {
     type,
     data: {
@@ -44,7 +48,9 @@ export function EphemeralResponse(data: InteractionResponseData, type = Interact
   } as InteractionResponse;
 }
 
-export function ActionRow(...components: (ButtonComponent | SelectMenuComponent | TextInputComponent)[]) {
+export function ActionRow(
+  ...components: (ButtonComponent | SelectMenuComponent | TextInputComponent)[]
+) {
   return {
     type: 1,
     components,
