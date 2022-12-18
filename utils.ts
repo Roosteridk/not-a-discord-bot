@@ -1,4 +1,3 @@
-// deno-lint-ignore-file no-redeclare
 import {
   ActionRow,
   ButtonComponent,
