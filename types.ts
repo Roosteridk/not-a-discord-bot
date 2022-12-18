@@ -16,6 +16,25 @@ export interface Application {
   cover_image?: string;
 }
 
+export interface ApplicationCommand {
+  id: bigint;
+  type: ApplicationCommandTypes;
+  application_id: bigint;
+  guild_id?: bigint;
+  name: string;
+  name_localizations?: Localization;
+  description: string;
+  description_localizations?: Localization;
+  options?: ApplicationCommandOption[];
+  dm_permission?: boolean;
+  default_member_permissions?: PermissionString[];
+  dm_member_permissions?: PermissionString[];
+  default_permission?: boolean;
+  nsfw?: boolean;
+  /** Autoincrementing version identifier updated during substantial record changes */
+  version: bigint;
+}
+
 export interface CreateApplicationCommand {
   name: string;
   /** Localization object for the `name` field. Values follow the same restrictions as `name` */

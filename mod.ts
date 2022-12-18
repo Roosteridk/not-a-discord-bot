@@ -1,6 +1,8 @@
 import {
+  ApplicationCommand,
   ApplicationCommandData,
   Channel,
+  CreateApplicationCommand,
   Interaction,
   InteractionResponse,
   InteractionResponseData,
@@ -12,16 +14,16 @@ import { ed25519Verify } from "https://deno.land/x/polkadot@0.2.19/util-crypto/m
 
 export default class Discord {
   publicKey: string;
-  applicationId: bigint;
+  applicationId: string;
   private auth: Headers;
-  private readonly discordApiUrl = "https://discord.com/api/v8/";
+  private readonly discordApiUrl = "https://discord.com/api/v10/";
 
   /** The parameters are the same as the ones in the Discord Developer Portal */
   constructor(
     { token, publicKey, applicationId }: {
       token: string;
       publicKey: string;
-      applicationId: bigint;
+      applicationId: string;
     },
   ) {
     this.publicKey = publicKey;
@@ -37,7 +39,7 @@ export default class Discord {
    * @returns The response to send back to Discord
    */
   async handleDiscordRequest(req: Request): Promise<Response> {
-    // Verify the request
+    // Verify that the request is from Discord
     const signature = req.headers.get("X-Signature-Ed25519");
     const timestamp = req.headers.get("X-Signature-Timestamp");
     const message = await req.text();
@@ -121,6 +123,28 @@ export default class Discord {
   }
 
   /**
+   * Registers guild-scoped commands. This will overwrite any existing commands with the same name.
+   * @param guildId The guild to register the command in
+   * @param commands The command(s) to register
+   * @returns The registered command(s)
+   */
+  registerGuildCommands(
+    guildId: bigint,
+    commands: CreateApplicationCommand[],
+  ) {
+    return Promise.all(commands.map(async (c) => {
+      const res = await this.fetch(
+        `applications/${this.applicationId}/guilds/${guildId}/commands`,
+        {
+          method: "POST",
+          body: JSON.stringify(c),
+        },
+      );
+      return await res.json() as ApplicationCommand;
+    }));
+  }
+
+  /**
    * Sends a message to a channel
    * @param channelId The channel to send the message to
    * @param content The content of the message
@@ -163,8 +187,11 @@ export default class Discord {
    * Adds a role to a guild member. Requires the `MANAGE_ROLES` permission.
    */
   async giveRole(userId: bigint, guildId: bigint, roleId: bigint) {
-    return await this.fetch(`guilds/${guildId}/members/${userId}/roles/${roleId}`, {
-      method: "PUT",
-    });
+    return await this.fetch(
+      `guilds/${guildId}/members/${userId}/roles/${roleId}`,
+      {
+        method: "PUT",
+      },
+    );
   }
 }
