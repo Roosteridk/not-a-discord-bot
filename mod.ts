@@ -24,7 +24,7 @@ export default class Discord {
     token: string,
     publicKey: string,
     applicationId: bigint,
-    middleware?: (...args: unknown[]) => Promise<unknown>,
+    middleware?: (i: Interaction) => Promise<unknown | InteractionResponse>,
   ) {
     this.publicKey = publicKey;
     this.applicationId = applicationId;
@@ -88,6 +88,10 @@ export default class Discord {
     // The result of the middleware is passed to the command or component
     if (this.middleware !== undefined) {
       middlewareRes = await this.middleware(i);
+    }
+    // If the middleware returns an InteractionResponse, we can just return that
+    if(middlewareRes instanceof Promise<InteractionResponse>) {
+      return middlewareRes;
     }
 
     switch (i.type) {
