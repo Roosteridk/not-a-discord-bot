@@ -1,3 +1,4 @@
+// deno-lint-ignore-file no-redeclare
 import {
   ActionRow,
   ButtonComponent,
@@ -35,17 +36,21 @@ export interface Component {
   ) => Promise<InteractionResponse>;
 }
 
-export function EphemeralResponse(
-  data: InteractionResponseData,
-  type = InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-) {
+export function EphemeralResponse(message: InteractionResponseData | string): InteractionResponse {
+  let data = {} as InteractionResponseData;
+  if (typeof message === "string") {
+    data.content = message;
+  }
+  if (typeof message === "object") {
+    data = message;
+  }
   return {
-    type,
+    type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
     data: {
       ...data,
       flags: MessageFlags.EPHEMERAL,
     },
-  } as InteractionResponse;
+  };
 }
 
 export function ActionRow(
