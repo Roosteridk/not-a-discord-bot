@@ -78,7 +78,7 @@ export default class Discord {
    * @param i The interaction to handle
    * @returns An InteractionResponse to send back to Discord
    */
-  private handleInteraction(
+  handleInteraction(
     i: Interaction,
   ): Promise<InteractionResponse> {
     switch (i.type) {
