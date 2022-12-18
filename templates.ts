@@ -8,6 +8,7 @@ import {
   MessageFlags,
   SelectMenuComponent,
   TextInputComponent,
+  ActionRow
 } from "./types.ts";
 
 export interface Command extends CreateApplicationCommand {
@@ -47,5 +48,5 @@ export function ActionRow(...components: (ButtonComponent | SelectMenuComponent 
   return {
     type: 1,
     components,
-  };
+  } as ActionRow;
 }
