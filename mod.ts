@@ -89,7 +89,7 @@ export default class Discord {
       case InteractionType.MESSAGE_COMPONENT || InteractionType.MODAL_SUBMIT:
         return import(
           `./components/${(i.data as MessageComponentData).custom_id}.ts`
-        ).then((c: Component) => c.exec(i));
+        ).then((c: Component<any>) => c.exec(i));
       case InteractionType.APPLICATION_COMMAND_AUTOCOMPLETE:
         return import(
           `./commands/${(i.data as ApplicationCommandData).name}.ts`

@@ -52,7 +52,7 @@ export function EphemeralResponse(message: InteractionResponseData | string): In
 }
 
 export function ActionRow(
-  ...components: (Button | SelectMenu | TextInput)[]
+  components: (Button | SelectMenu | TextInput)[]
 ) {
   return {
     type: 1,
