@@ -115,10 +115,10 @@ export interface ApplicationCommandOptionChoice {
 /**An Action Row is a non-interactive container component for other types of components. */
 export interface ActionRow {
   type: 1;
-  components: (ButtonComponent | SelectMenuComponent | TextInputComponent)[];
+  components: (Button | SelectMenu | TextInput)[];
 }
 
-export interface ButtonComponent {
+export interface Button {
   type: 2;
   style: ComponentType;
   label?: string;
@@ -128,7 +128,7 @@ export interface ButtonComponent {
   disabled?: boolean;
 }
 
-export interface SelectMenuComponent {
+export interface SelectMenu {
   type: 3;
   custom_id: string;
   options: SelectMenuOption[];
@@ -147,7 +147,7 @@ export interface SelectMenuOption {
   default?: boolean;
 }
 
-export interface TextInputComponent {
+export interface TextInput {
   type: 4;
   custom_id: string;
   placeholder?: string;
