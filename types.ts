@@ -82,8 +82,8 @@ export interface ApplicationCommandOption {
   choices?: ApplicationCommandOptionChoice[];
   options?: ApplicationCommandOption[];
   channel_types?: ChannelType[];
-  min_value?: number;
-  max_value?: number;
+  min_value?: ComponentType;
+  max_value?: ComponentType;
   autocomplete?: boolean;
 }
 
@@ -97,7 +97,7 @@ export enum ApplicationCommandOptionType {
   CHANNEL,
   ROLE,
   MENTIONABLE,
-  NUMBER,
+  ComponentType,
   ATTACHMENT,
 }
 
@@ -109,7 +109,7 @@ export enum ApplicationCommandType {
 
 export interface ApplicationCommandOptionChoice {
   name: string;
-  value: string | number;
+  value: string | ComponentType;
 }
 
 /**An Action Row is a non-interactive container component for other types of components. */
@@ -120,7 +120,7 @@ export interface ActionRow {
 
 export interface ButtonComponent {
   type: 2;
-  style: number;
+  style: ComponentType;
   label?: string;
   emoji?: Emoji;
   custom_id?: string;
@@ -133,8 +133,8 @@ export interface SelectMenuComponent {
   custom_id: string;
   options: SelectMenuOption[];
   placeholder?: string;
-  min_values?: number;
-  max_values?: number;
+  min_values?: ComponentType;
+  max_values?: ComponentType;
   disabled?: boolean;
   channel_types?: ChannelType[];
 }
@@ -151,8 +151,15 @@ export interface TextInputComponent {
   type: 4;
   custom_id: string;
   placeholder?: string;
-  min_length?: number;
-  max_length?: number;
+  min_length?: ComponentType;
+  max_length?: ComponentType;
+}
+
+export enum ComponentType {
+  ActionRow = 1,
+  Button,
+  SelectMenu,
+  TextInput,
 }
 
 export enum ChannelType {
@@ -179,7 +186,7 @@ export interface Interaction {
   member?: GuildMember;
   user?: DiscordUser;
   token: string;
-  version: number;
+  version: ComponentType;
   message?: Message;
 }
 
@@ -193,13 +200,13 @@ export interface ApplicationCommandData {
 
 export interface MessageComponentData {
   custom_id: string;
-  component_type: number;
+  component_type: ComponentType;
   values?: string[];
 }
 
 export interface ModalSubmitData {
   custom_id: string;
-  component_type: number;
+  component_type: ComponentType;
   values?: string[];
 }
 
@@ -213,7 +220,7 @@ export interface InteractionDataResolved {
 export interface ApplicationCommandInteractionDataOption {
   name: string;
   type: ApplicationCommandOptionType;
-  value?: string | number | boolean;
+  value?: string | ComponentType | boolean;
   options?: ApplicationCommandInteractionDataOption[];
 }
 
@@ -245,7 +252,7 @@ export interface InteractionResponseData {
   content?: string;
   embeds?: Embed[];
   allowed_mentions?: AllowedMentions;
-  flags?: number;
+  flags?: ComponentType;
   components?: ActionRow[];
   attachments?: Attachment[];
 }
@@ -256,7 +263,7 @@ export interface Embed {
   description?: string;
   url?: string;
   timestamp?: string;
-  color?: number;
+  color?: ComponentType;
   footer?: {
     text: string;
     icon_url?: string;
@@ -265,19 +272,19 @@ export interface Embed {
   image?: {
     url: string;
     proxy_url?: string;
-    height?: number;
-    width?: number;
+    height?: ComponentType;
+    width?: ComponentType;
   };
   thumbnail?: {
     url: string;
     proxy_url?: string;
-    height?: number;
-    width?: number;
+    height?: ComponentType;
+    width?: ComponentType;
   };
   video?: {
     url: string;
-    height?: number;
-    width?: number;
+    height?: ComponentType;
+    width?: ComponentType;
   };
   provider?: {
     name?: string;
@@ -307,11 +314,11 @@ export interface Attachment {
   id: bigint;
   filename: string;
   content_type?: string;
-  size: number;
+  size: ComponentType;
   url: string;
   proxy_url: string;
-  height?: number;
-  width?: number;
+  height?: ComponentType;
+  width?: ComponentType;
 }
 
 export interface DiscordUser {
@@ -325,9 +332,9 @@ export interface DiscordUser {
   locale?: string;
   verified?: boolean;
   email?: string;
-  flags?: number;
-  premium_type?: number;
-  public_flags?: number;
+  flags?: ComponentType;
+  premium_type?: ComponentType;
+  public_flags?: ComponentType;
 }
 
 export interface GuildMember {
@@ -345,9 +352,9 @@ export interface GuildMember {
 export interface DiscordRole {
   id: bigint;
   name: string;
-  color: number;
+  color: ComponentType;
   hoist: boolean;
-  position: number;
+  position: ComponentType;
   permissions: string;
   managed: boolean;
   mentionable: boolean;
@@ -357,15 +364,15 @@ export interface Channel {
   id: bigint;
   type: ChannelType;
   guild_id?: bigint;
-  position?: number;
+  position?: ComponentType;
   permission_overwrites?: PermissionsOverwrite[];
   name?: string;
   topic?: string;
   nsfw?: boolean;
   last_message_id?: bigint;
-  bitrate?: number;
-  user_limit?: number;
-  rate_limit_per_user?: number;
+  bitrate?: ComponentType;
+  user_limit?: ComponentType;
+  rate_limit_per_user?: ComponentType;
   recipients?: DiscordUser[];
   icon?: string;
   owner_id?: bigint;
@@ -373,24 +380,24 @@ export interface Channel {
   parent_id?: bigint;
   last_pin_timestamp?: string;
   rtc_region?: string;
-  video_quality_mode?: number;
-  message_count?: number;
-  member_count?: number;
+  video_quality_mode?: ComponentType;
+  message_count?: ComponentType;
+  member_count?: ComponentType;
   thread_metadata?: ThreadMetadata;
   member?: ThreadMember;
-  default_auto_archive_duration?: number;
+  default_auto_archive_duration?: ComponentType;
 }
 
 export interface PermissionsOverwrite {
   id: bigint;
-  type: number;
+  type: ComponentType;
   allow: string;
   deny: string;
 }
 
 export interface ThreadMetadata {
   archived: boolean;
-  auto_archive_duration: number;
+  auto_archive_duration: ComponentType;
   archive_timestamp: string;
   locked?: boolean;
 }
@@ -399,7 +406,7 @@ export interface ThreadMember {
   id: bigint;
   user_id: bigint;
   join_timestamp: string;
-  flags: number;
+  flags: ComponentType;
 }
 
 export interface Emoji {
