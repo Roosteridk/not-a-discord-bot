@@ -6,9 +6,9 @@ import {
   InteractionResponseData,
   InteractionResponseType,
   MessageFlags,
-  ButtonComponent,
-  SelectMenuComponent,
-  TextInputComponent,
+  Button,
+  SelectMenu,
+  TextInput,
 } from "./types.ts";
 
 // These are utility functions and types that you can use in your code to help you write your commands and components
@@ -27,7 +27,7 @@ export interface Command extends CreateApplicationCommand {
 }
 
 // If I use interface insttead of type, I get an error. Why? I don't know. I'm not a typescript expert. This further blurs the line between types and interfaces.
-export type Component<T extends ButtonComponent | SelectMenuComponent | TextInputComponent> = {
+export type Component<T extends Button | SelectMenu | TextInput> = {
   [P in keyof T]: T[P];
 } & {
   custom_id: string;
@@ -52,7 +52,7 @@ export function EphemeralResponse(message: InteractionResponseData | string): In
 }
 
 export function ActionRow(
-  ...components: (ButtonComponent | SelectMenuComponent | TextInputComponent)[]
+  ...components: (Button | SelectMenu | TextInput)[]
 ) {
   return {
     type: 1,
