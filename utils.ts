@@ -1,5 +1,5 @@
 import {
-  ActionRow,
+  ActionRow,   
   CreateApplicationCommand,
   Interaction,
   InteractionResponse,
@@ -27,12 +27,10 @@ export interface Command extends CreateApplicationCommand {
 }
 
 // If I use interface insttead of type, I get an error. Why? I don't know. I'm not a typescript expert. This further blurs the line between types and interfaces.
-export type Component = (ButtonComponent | SelectMenuComponent | TextInputComponent) & {
-  custom_id: string;
-  exec: (
-    interaction: Interaction,
-    ...options: unknown[]
-  ) => Promise<InteractionResponse>;
+export type Component<T extends ButtonComponent | SelectMenuComponent | TextInputComponent> = {
+  [P in keyof T]: T[P];
+} & {
+  exec: (interaction: Interaction, ...options: unknown[]) => Promise<InteractionResponse>;
 }
 
 export function EphemeralResponse(message: InteractionResponseData | string): InteractionResponse {
