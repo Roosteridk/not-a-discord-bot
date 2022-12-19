@@ -125,13 +125,21 @@ export enum ComponentType {
 
 /**An Action Row is a non-interactive container component for other types of components. */
 export interface ActionRow {
-  type: 1;
+  type: ComponentType.ActionRow;
   components: (ButtonComponent | SelectMenuComponent | TextInputComponent)[];
 }
 
+export enum ButtonStyle {
+  Primary = 1,
+  Secondary,
+  Success,
+  Danger,
+  Link,
+}
+
 export interface ButtonComponent {
-  type: 2;
-  style: number;
+  type: ComponentType.Button;
+  style: ButtonStyle;
   label?: string;
   emoji?: Emoji;
   custom_id?: string;
@@ -140,7 +148,7 @@ export interface ButtonComponent {
 }
 
 export interface SelectMenuComponent {
-  type: 3;
+  type: ComponentType.ChannelSelect | ComponentType.MentionableSelect | ComponentType.RoleSelect | ComponentType.StringSelect | ComponentType.UserSelect;
   custom_id: string;
   options: SelectMenuOption[];
   placeholder?: string;
@@ -159,7 +167,7 @@ export interface SelectMenuOption {
 }
 
 export interface TextInputComponent {
-  type: 4;
+  type: ComponentType.TextInput;
   custom_id: string;
   placeholder?: string;
   min_length?: number;
