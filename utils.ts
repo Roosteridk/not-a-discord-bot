@@ -30,6 +30,7 @@ export interface Command extends CreateApplicationCommand {
 export type Component<T extends ButtonComponent | SelectMenuComponent | TextInputComponent> = {
   [P in keyof T]: T[P];
 } & {
+  custom_id: string;
   exec: (interaction: Interaction, ...options: unknown[]) => Promise<InteractionResponse>;
 }
 
