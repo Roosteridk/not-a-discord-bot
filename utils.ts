@@ -16,14 +16,14 @@ import {
 export interface Command extends CreateApplicationCommand {
   name: string;
   description: string;
-  exec: (
+  exec (
     interaction: Interaction,
     ...options: unknown[]
-  ) => Promise<InteractionResponse>;
-  autocomplete?: (
+  ): Promise<InteractionResponse>;
+  autocomplete?(
     interaction: Interaction,
     ...options: unknown[]
-  ) => Promise<InteractionResponse>;
+  ): Promise<InteractionResponse>;
 }
 
 // If I use interface insttead of type, I get an error. Why? I don't know. I'm not a typescript expert. This further blurs the line between types and interfaces.
@@ -31,7 +31,7 @@ export type Component<T extends Button | SelectMenu | TextInput> = {
   [P in keyof T]: T[P];
 } & {
   custom_id: string;
-  exec: (interaction: Interaction, ...options: unknown[]) => Promise<InteractionResponse>;
+  exec(interaction: Interaction, ...options: unknown[]): Promise<InteractionResponse>;
 }
 
 export function EphemeralResponse(message: InteractionResponseData | string): InteractionResponse {
