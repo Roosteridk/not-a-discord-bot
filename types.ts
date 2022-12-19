@@ -112,6 +112,17 @@ export interface ApplicationCommandOptionChoice {
   value: string | number;
 }
 
+export enum ComponentType {
+  ActionRow = 1,
+  Button,
+  StringSelect,
+  TextInput,
+  UserSelect,
+  RoleSelect,
+  MentionableSelect,
+  ChannelSelect
+}
+
 /**An Action Row is a non-interactive container component for other types of components. */
 export interface ActionRow {
   type: 1;

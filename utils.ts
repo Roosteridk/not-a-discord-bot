@@ -1,13 +1,12 @@
-// deno-lint-ignore-file no-redeclare
 import {
   ActionRow,
-  ButtonComponent,
   CreateApplicationCommand,
   Interaction,
   InteractionResponse,
   InteractionResponseData,
   InteractionResponseType,
   MessageFlags,
+  ButtonComponent,
   SelectMenuComponent,
   TextInputComponent,
 } from "./types.ts";
@@ -27,9 +26,9 @@ export interface Command extends CreateApplicationCommand {
   ) => Promise<InteractionResponse>;
 }
 
-export interface Component {
+// If I use interface insttead of type, I get an error. Why? I don't know. I'm not a typescript expert. This further blurs the line between types and interfaces.
+export type Component = (ButtonComponent | SelectMenuComponent | TextInputComponent) & {
   custom_id: string;
-  component: ButtonComponent | SelectMenuComponent | TextInputComponent;
   exec: (
     interaction: Interaction,
     ...options: unknown[]
