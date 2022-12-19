@@ -82,8 +82,8 @@ export interface ApplicationCommandOption {
   choices?: ApplicationCommandOptionChoice[];
   options?: ApplicationCommandOption[];
   channel_types?: ChannelType[];
-  min_value?: ComponentType;
-  max_value?: ComponentType;
+  min_value?: number;
+  max_value?: number;
   autocomplete?: boolean;
 }
 
@@ -97,7 +97,7 @@ export enum ApplicationCommandOptionType {
   CHANNEL,
   ROLE,
   MENTIONABLE,
-  ComponentType,
+  NUMBER,
   ATTACHMENT,
 }
 
@@ -109,18 +109,18 @@ export enum ApplicationCommandType {
 
 export interface ApplicationCommandOptionChoice {
   name: string;
-  value: string | ComponentType;
+  value: string | number;
 }
 
 /**An Action Row is a non-interactive container component for other types of components. */
 export interface ActionRow {
   type: 1;
-  components: (Button | SelectMenu | TextInput)[];
+  components: (ButtonComponent | SelectMenuComponent | TextInputComponent)[];
 }
 
-export interface Button {
+export interface ButtonComponent {
   type: 2;
-  style: ComponentType;
+  style: number;
   label?: string;
   emoji?: Emoji;
   custom_id?: string;
@@ -128,13 +128,13 @@ export interface Button {
   disabled?: boolean;
 }
 
-export interface SelectMenu {
+export interface SelectMenuComponent {
   type: 3;
   custom_id: string;
   options: SelectMenuOption[];
   placeholder?: string;
-  min_values?: ComponentType;
-  max_values?: ComponentType;
+  min_values?: number;
+  max_values?: number;
   disabled?: boolean;
   channel_types?: ChannelType[];
 }
@@ -147,19 +147,12 @@ export interface SelectMenuOption {
   default?: boolean;
 }
 
-export interface TextInput {
+export interface TextInputComponent {
   type: 4;
   custom_id: string;
   placeholder?: string;
-  min_length?: ComponentType;
-  max_length?: ComponentType;
-}
-
-export enum ComponentType {
-  ActionRow = 1,
-  Button,
-  SelectMenu,
-  TextInput,
+  min_length?: number;
+  max_length?: number;
 }
 
 export enum ChannelType {
@@ -186,7 +179,7 @@ export interface Interaction {
   member?: GuildMember;
   user?: DiscordUser;
   token: string;
-  version: ComponentType;
+  version: number;
   message?: Message;
 }
 
@@ -200,13 +193,13 @@ export interface ApplicationCommandData {
 
 export interface MessageComponentData {
   custom_id: string;
-  component_type: ComponentType;
+  component_type: number;
   values?: string[];
 }
 
 export interface ModalSubmitData {
   custom_id: string;
-  component_type: ComponentType;
+  component_type: number;
   values?: string[];
 }
 
@@ -220,7 +213,7 @@ export interface InteractionDataResolved {
 export interface ApplicationCommandInteractionDataOption {
   name: string;
   type: ApplicationCommandOptionType;
-  value?: string | ComponentType | boolean;
+  value?: string | number | boolean;
   options?: ApplicationCommandInteractionDataOption[];
 }
 
@@ -252,7 +245,7 @@ export interface InteractionResponseData {
   content?: string;
   embeds?: Embed[];
   allowed_mentions?: AllowedMentions;
-  flags?: ComponentType;
+  flags?: number;
   components?: ActionRow[];
   attachments?: Attachment[];
 }
@@ -263,7 +256,7 @@ export interface Embed {
   description?: string;
   url?: string;
   timestamp?: string;
-  color?: ComponentType;
+  color?: number;
   footer?: {
     text: string;
     icon_url?: string;
@@ -272,19 +265,19 @@ export interface Embed {
   image?: {
     url: string;
     proxy_url?: string;
-    height?: ComponentType;
-    width?: ComponentType;
+    height?: number;
+    width?: number;
   };
   thumbnail?: {
     url: string;
     proxy_url?: string;
-    height?: ComponentType;
-    width?: ComponentType;
+    height?: number;
+    width?: number;
   };
   video?: {
     url: string;
-    height?: ComponentType;
-    width?: ComponentType;
+    height?: number;
+    width?: number;
   };
   provider?: {
     name?: string;
@@ -314,11 +307,11 @@ export interface Attachment {
   id: bigint;
   filename: string;
   content_type?: string;
-  size: ComponentType;
+  size: number;
   url: string;
   proxy_url: string;
-  height?: ComponentType;
-  width?: ComponentType;
+  height?: number;
+  width?: number;
 }
 
 export interface DiscordUser {
@@ -332,9 +325,9 @@ export interface DiscordUser {
   locale?: string;
   verified?: boolean;
   email?: string;
-  flags?: ComponentType;
-  premium_type?: ComponentType;
-  public_flags?: ComponentType;
+  flags?: number;
+  premium_type?: number;
+  public_flags?: number;
 }
 
 export interface GuildMember {
@@ -352,9 +345,9 @@ export interface GuildMember {
 export interface DiscordRole {
   id: bigint;
   name: string;
-  color: ComponentType;
+  color: number;
   hoist: boolean;
-  position: ComponentType;
+  position: number;
   permissions: string;
   managed: boolean;
   mentionable: boolean;
@@ -364,15 +357,15 @@ export interface Channel {
   id: bigint;
   type: ChannelType;
   guild_id?: bigint;
-  position?: ComponentType;
+  position?: number;
   permission_overwrites?: PermissionsOverwrite[];
   name?: string;
   topic?: string;
   nsfw?: boolean;
   last_message_id?: bigint;
-  bitrate?: ComponentType;
-  user_limit?: ComponentType;
-  rate_limit_per_user?: ComponentType;
+  bitrate?: number;
+  user_limit?: number;
+  rate_limit_per_user?: number;
   recipients?: DiscordUser[];
   icon?: string;
   owner_id?: bigint;
@@ -380,24 +373,24 @@ export interface Channel {
   parent_id?: bigint;
   last_pin_timestamp?: string;
   rtc_region?: string;
-  video_quality_mode?: ComponentType;
-  message_count?: ComponentType;
-  member_count?: ComponentType;
+  video_quality_mode?: number;
+  message_count?: number;
+  member_count?: number;
   thread_metadata?: ThreadMetadata;
   member?: ThreadMember;
-  default_auto_archive_duration?: ComponentType;
+  default_auto_archive_duration?: number;
 }
 
 export interface PermissionsOverwrite {
   id: bigint;
-  type: ComponentType;
+  type: number;
   allow: string;
   deny: string;
 }
 
 export interface ThreadMetadata {
   archived: boolean;
-  auto_archive_duration: ComponentType;
+  auto_archive_duration: number;
   archive_timestamp: string;
   locked?: boolean;
 }
@@ -406,7 +399,7 @@ export interface ThreadMember {
   id: bigint;
   user_id: bigint;
   join_timestamp: string;
-  flags: ComponentType;
+  flags: number;
 }
 
 export interface Emoji {
