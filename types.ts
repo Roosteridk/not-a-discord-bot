@@ -193,11 +193,11 @@ export enum ChannelType {
   GUILD_STAGE_VOICE,
 }
 
-export interface Interaction {
+export interface Interaction<T = ApplicationCommandData | MessageComponentData | ModalSubmitData> {
   id: bigint;
   application_id: bigint;
   type: InteractionType;
-  data?: ApplicationCommandData | MessageComponentData | ModalSubmitData;
+  data?: T;
   guild_id?: bigint;
   channel_id?: bigint;
   member?: GuildMember;
@@ -435,7 +435,34 @@ export interface Emoji {
 export interface Message {
   id: bigint;
   channel_id: bigint;
-  guild_id?: bigint;
+  author: DiscordUser;
+  content: string;
+  timestamp: string;
+  edited_timestamp?: string;
+  tts: boolean;
+  mention_everyone: boolean;
+  mentions: DiscordUser[];
+  mention_roles: DiscordRole[];
+  //mention_channels?: ChannelMention[];
+  attachments: Attachment[];
+  embeds: Embed[];
+  //reactions?: Reaction[];
+  nonce?: string;
+  pinned: boolean;
+  webhook_id?: bigint;
+  type: number;
+  //activity?: MessageActivity;
+  application?: Partial<Application>;
+  application_id?: bigint;
+  //message_reference?: MessageReference;
+  flags?: number;
+  referenced_message?: Message;
+  interaction?: Interaction;
+  thread?: Channel;
+  components?: ActionRow[];
+  //sticker_items?: StickerItem[];
+  //stickers?: Sticker[];
+  position?: number;
 }
 
 export enum MessageFlags {

@@ -171,14 +171,14 @@ export default class Discord {
 
   async editOriginalInteractionResponse(
     token: string,
-    content: InteractionResponseData,
+    data: InteractionResponseData,
   ) {
     return await this.fetch(
       `webhooks/${this.applicationId}/${token}/messages/@original`,
       {
         method: "PATCH",
         body: JSON.stringify({
-          content,
+          data,
         }),
       },
     );

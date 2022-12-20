@@ -18,11 +18,11 @@ export interface Command extends CreateApplicationCommand {
   description: string;
   exec (
     interaction: Interaction,
-    ...options: unknown[]
+    ...args: unknown[]
   ): Promise<InteractionResponse>;
   autocomplete?(
     interaction: Interaction,
-    ...options: unknown[]
+    ...args: unknown[]
   ): Promise<InteractionResponse>;
 }
 
@@ -31,7 +31,7 @@ export type Component<T extends Button | SelectMenu | TextInput> = {
   [P in keyof T]: T[P];
 } & {
   custom_id: string;
-  exec(interaction: Interaction, ...options: unknown[]): Promise<InteractionResponse>;
+  exec(interaction: Interaction, ...args: unknown[]): Promise<InteractionResponse>;
 }
 
 export function EphemeralResponse(message: InteractionResponseData | string): InteractionResponse {
