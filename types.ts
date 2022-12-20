@@ -145,7 +145,7 @@ export type Button = {
   custom_id?: string;
   url?: string;
   disabled?: boolean;
-}
+};
 
 export interface SelectMenu {
   type:
@@ -193,7 +193,9 @@ export enum ChannelType {
   GUILD_STAGE_VOICE,
 }
 
-export interface Interaction<T = ApplicationCommandData | MessageComponentData | ModalSubmitData> {
+export interface Interaction<
+  T = ApplicationCommandData | MessageComponentData | ModalSubmitData,
+> {
   id: bigint;
   application_id: bigint;
   type: InteractionType;

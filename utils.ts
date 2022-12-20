@@ -1,12 +1,13 @@
 import {
-  ActionRow,   
+  ActionRow,
+  ApplicationCommandData,
+  Button,
   CreateApplicationCommand,
   Interaction,
   InteractionResponse,
   InteractionResponseData,
   InteractionResponseType,
   MessageFlags,
-  Button,
   SelectMenu,
   TextInput,
 } from "./types.ts";
@@ -16,8 +17,8 @@ import {
 export interface Command extends CreateApplicationCommand {
   name: string;
   description: string;
-  exec (
-    interaction: Interaction,
+  exec(
+    interaction: Interaction<ApplicationCommandData>,
     ...args: unknown[]
   ): Promise<InteractionResponse>;
   autocomplete?(
@@ -27,14 +28,21 @@ export interface Command extends CreateApplicationCommand {
 }
 
 // If I use interface insttead of type, I get an error. Why? I don't know. I'm not a typescript expert. This further blurs the line between types and interfaces.
-export type Component<T extends Button | SelectMenu | TextInput> = {
-  [P in keyof T]: T[P];
-} & {
-  custom_id: string;
-  exec(interaction: Interaction, ...args: unknown[]): Promise<InteractionResponse>;
-}
+export type Component<T extends Button | SelectMenu | TextInput> =
+  & {
+    [P in keyof T]: T[P];
+  }
+  & {
+    custom_id: string;
+    exec(
+      interaction: Interaction<T>,
+      ...args: unknown[]
+    ): Promise<InteractionResponse>;
+  };
 
-export function EphemeralResponse(message: InteractionResponseData | string): InteractionResponse {
+export function EphemeralResponse(
+  message: InteractionResponseData | string,
+): InteractionResponse {
   let data = {} as InteractionResponseData;
   if (typeof message === "string") {
     data.content = message;
@@ -52,7 +60,7 @@ export function EphemeralResponse(message: InteractionResponseData | string): In
 }
 
 export function ActionRow(
-  components: (Button | SelectMenu | TextInput)[]
+  components: (Button | SelectMenu | TextInput)[],
 ) {
   return {
     type: 1,
