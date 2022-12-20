@@ -471,7 +471,7 @@ export type Message = {
   //message_reference?: MessageReference;
   flags?: number;
   referenced_message?: Message;
-  interaction?: Interaction;
+  interaction?: MessageInteraction;
   thread?: Channel;
   components?: ActionRow[];
   //sticker_items?: StickerItem[];
