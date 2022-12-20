@@ -212,6 +212,15 @@ export type Interaction<T = InteractionType> = {
   message?: Message;
 };
 
+/**This is sent on the message object when the message is a response to an Application Command Interaction without an existing message. */
+export type MessageInteraction = {
+  id: bigint;
+  type: InteractionType.MESSAGE_COMPONENT;
+  name: string;
+  user: DiscordUser;
+  member?: Partial<GuildMember>;
+}
+
 export type ApplicationCommandData = {
   id: bigint;
   name: string;
