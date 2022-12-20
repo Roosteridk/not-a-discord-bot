@@ -1,4 +1,4 @@
-export interface Application {
+export type Application = {
   id: bigint;
   name: string;
   icon: string | null;
@@ -14,9 +14,9 @@ export interface Application {
   primary_sku_id?: bigint;
   slug?: string;
   cover_image?: string;
-}
+};
 
-export interface ApplicationCommand {
+export type ApplicationCommand = {
   id: bigint;
   type: ApplicationCommandTypes;
   application_id: bigint;
@@ -33,9 +33,9 @@ export interface ApplicationCommand {
   nsfw?: boolean;
   /** Autoincrementing version identifier updated during substantial record changes */
   version: bigint;
-}
+};
 
-export interface CreateApplicationCommand {
+export type CreateApplicationCommand = {
   name: string;
   /** Localization object for the `name` field. Values follow the same restrictions as `name` */
   nameLocalizations?: Localization;
@@ -51,17 +51,17 @@ export interface CreateApplicationCommand {
   defaultMemberPermissions?: PermissionString[];
   /** Indicates whether the command is available in DMs with the app, only for globally-scoped commands. By default, commands are visible. */
   dmPermission?: boolean;
-}
+};
 
-export interface Localization {
+export type Localization = {
   [key: string]: string;
-}
+};
 
-export interface PermissionString {
+export type PermissionString = {
   id: bigint;
   type: PermissionType;
   permission: boolean;
-}
+};
 
 export enum PermissionType {
   ROLE = 1,
@@ -74,7 +74,7 @@ export enum ApplicationCommandTypes {
   Message,
 }
 
-export interface ApplicationCommandOption {
+export type ApplicationCommandOption = {
   type: ApplicationCommandOptionType;
   name: string;
   description: string;
@@ -85,7 +85,7 @@ export interface ApplicationCommandOption {
   min_value?: number;
   max_value?: number;
   autocomplete?: boolean;
-}
+};
 
 export enum ApplicationCommandOptionType {
   SUB_COMMAND = 1,
@@ -107,10 +107,10 @@ export enum ApplicationCommandType {
   MESSAGE,
 }
 
-export interface ApplicationCommandOptionChoice {
+export type ApplicationCommandOptionChoice = {
   name: string;
   value: string | number;
-}
+};
 
 export enum ComponentType {
   ActionRow = 1,
@@ -124,10 +124,10 @@ export enum ComponentType {
 }
 
 /**An Action Row is a non-interactive container component for other types of components. */
-export interface ActionRow {
+export type ActionRow = {
   type: ComponentType.ActionRow;
   components: (Button | SelectMenu | TextInput)[];
-}
+};
 
 export enum ButtonStyle {
   Primary = 1,
@@ -147,7 +147,7 @@ export type Button = {
   disabled?: boolean;
 };
 
-export interface SelectMenu {
+export type SelectMenu = {
   type:
     | ComponentType.ChannelSelect
     | ComponentType.MentionableSelect
@@ -161,23 +161,23 @@ export interface SelectMenu {
   max_values?: number;
   disabled?: boolean;
   channel_types?: ChannelType[];
-}
+};
 
-export interface SelectMenuOption {
+export type SelectMenuOption = {
   label: string;
   value: string;
   description?: string;
   emoji?: Emoji;
   default?: boolean;
-}
+};
 
-export interface TextInput {
+export type TextInput = {
   type: ComponentType.TextInput;
   custom_id: string;
   placeholder?: string;
   min_length?: number;
   max_length?: number;
-}
+};
 
 export enum ChannelType {
   GUILD_TEXT = 0,
@@ -193,55 +193,65 @@ export enum ChannelType {
   GUILD_STAGE_VOICE,
 }
 
-export interface Interaction<
-  T = ApplicationCommandData | MessageComponentData | ModalSubmitData,
-> {
-  id: bigint;
-  application_id: bigint;
-  type: InteractionType;
-  data?: T;
-  guild_id?: bigint;
-  channel_id?: bigint;
-  member?: GuildMember;
-  user?: DiscordUser;
-  token: string;
-  version: number;
-  message?: Message;
-}
+export type Interaction =
+  & {
+    id: bigint;
+    application_id: bigint;
+    guild_id?: bigint;
+    channel_id?: bigint;
+    member?: GuildMember;
+    user?: DiscordUser;
+    token: string;
+    version: number;
+    message?: Message;
+  }
+  & (
+    | { type: InteractionType.PING }
+    | {
+      type: InteractionType.APPLICATION_COMMAND;
+      data: ApplicationCommandData;
+    }
+    | {
+      type: InteractionType.APPLICATION_COMMAND_AUTOCOMPLETE;
+      data: Partial<ApplicationCommandData>;
+    }
+    | { type: InteractionType.MESSAGE_COMPONENT; data: MessageComponentData }
+    | { type: InteractionType.MODAL_SUBMIT; data: ModalSubmitData }
+  );
 
-export interface ApplicationCommandData {
+export type ApplicationCommandData = {
   id: bigint;
   name: string;
   type: ApplicationCommandType;
   resolved?: InteractionDataResolved;
   options?: ApplicationCommandInteractionDataOption[];
-}
+};
 
-export interface MessageComponentData {
+export type MessageComponentData = {
   custom_id: string;
   component_type: number;
   values?: string[];
-}
+};
 
-export interface ModalSubmitData {
+export type ModalSubmitData = {
   custom_id: string;
   component_type: number;
   values?: string[];
-}
+};
 
-export interface InteractionDataResolved {
+export type InteractionDataResolved = {
   users?: DiscordUser[];
   members?: GuildMember[];
   roles?: DiscordRole[];
   channels?: Channel[];
-}
+};
 
-export interface ApplicationCommandInteractionDataOption {
+export type ApplicationCommandInteractionDataOption = {
   name: string;
   type: ApplicationCommandOptionType;
   value?: string | number | boolean;
   options?: ApplicationCommandInteractionDataOption[];
-}
+};
 
 export enum InteractionType {
   PING = 1,
@@ -261,12 +271,12 @@ export enum InteractionResponseType {
   MODAL,
 }
 
-export interface InteractionResponse {
+export type InteractionResponse = {
   type: InteractionResponseType;
   data?: InteractionResponseData;
-}
+};
 
-export interface InteractionResponseData {
+export type InteractionResponseData = {
   tts?: boolean;
   content?: string;
   embeds?: Embed[];
@@ -274,9 +284,9 @@ export interface InteractionResponseData {
   flags?: number;
   components?: ActionRow[];
   attachments?: Attachment[];
-}
+};
 
-export interface Embed {
+export type Embed = {
   title?: string;
   type?: string;
   description?: string;
@@ -320,16 +330,16 @@ export interface Embed {
     value: string;
     inline?: boolean;
   }[];
-}
+};
 
-export interface AllowedMentions {
+export type AllowedMentions = {
   parse?: string[];
   roles?: bigint[];
   users?: bigint[];
   replied_user?: boolean;
-}
+};
 
-export interface Attachment {
+export type Attachment = {
   id: bigint;
   filename: string;
   content_type?: string;
@@ -338,9 +348,9 @@ export interface Attachment {
   proxy_url: string;
   height?: number;
   width?: number;
-}
+};
 
-export interface DiscordUser {
+export type DiscordUser = {
   id: bigint;
   username: string;
   discriminator: string;
@@ -354,9 +364,9 @@ export interface DiscordUser {
   flags?: number;
   premium_type?: number;
   public_flags?: number;
-}
+};
 
-export interface GuildMember {
+export type GuildMember = {
   user?: DiscordUser;
   nick?: string;
   roles: DiscordRole[];
@@ -366,9 +376,9 @@ export interface GuildMember {
   mute: boolean;
   pending?: boolean;
   permissions?: string;
-}
+};
 
-export interface DiscordRole {
+export type DiscordRole = {
   id: bigint;
   name: string;
   color: number;
@@ -377,9 +387,9 @@ export interface DiscordRole {
   permissions: string;
   managed: boolean;
   mentionable: boolean;
-}
+};
 
-export interface Channel {
+export type Channel = {
   id: bigint;
   type: ChannelType;
   guild_id?: bigint;
@@ -405,36 +415,36 @@ export interface Channel {
   thread_metadata?: ThreadMetadata;
   member?: ThreadMember;
   default_auto_archive_duration?: number;
-}
+};
 
-export interface PermissionsOverwrite {
+export type PermissionsOverwrite = {
   id: bigint;
   type: number;
   allow: string;
   deny: string;
-}
+};
 
-export interface ThreadMetadata {
+export type ThreadMetadata = {
   archived: boolean;
   auto_archive_duration: number;
   archive_timestamp: string;
   locked?: boolean;
-}
+};
 
-export interface ThreadMember {
+export type ThreadMember = {
   id: bigint;
   user_id: bigint;
   join_timestamp: string;
   flags: number;
-}
+};
 
-export interface Emoji {
+export type Emoji = {
   id?: bigint;
   name?: string;
   animated?: boolean;
-}
+};
 
-export interface Message {
+export type Message = {
   id: bigint;
   channel_id: bigint;
   author: DiscordUser;
@@ -465,7 +475,7 @@ export interface Message {
   //sticker_items?: StickerItem[];
   //stickers?: Sticker[];
   position?: number;
-}
+};
 
 export enum MessageFlags {
   CROSSPOSTED = 1 << 0,

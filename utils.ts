@@ -1,6 +1,5 @@
 import {
   ActionRow,
-  ApplicationCommandData,
   Button,
   CreateApplicationCommand,
   Interaction,
@@ -14,18 +13,18 @@ import {
 
 // These are utility functions and types that you can use in your code to help you write your commands and components
 
-export interface Command extends CreateApplicationCommand {
+export type Command = CreateApplicationCommand & {
   name: string;
   description: string;
   exec(
-    interaction: Interaction<ApplicationCommandData>,
+    interaction: Interaction,
     ...args: unknown[]
   ): Promise<InteractionResponse>;
   autocomplete?(
     interaction: Interaction,
     ...args: unknown[]
   ): Promise<InteractionResponse>;
-}
+};
 
 // If I use interface insttead of type, I get an error. Why? I don't know. I'm not a typescript expert. This further blurs the line between types and interfaces.
 export type Component<T extends Button | SelectMenu | TextInput> =
@@ -35,7 +34,7 @@ export type Component<T extends Button | SelectMenu | TextInput> =
   & {
     custom_id: string;
     exec(
-      interaction: Interaction<T>,
+      interaction: Interaction,
       ...args: unknown[]
     ): Promise<InteractionResponse>;
   };
