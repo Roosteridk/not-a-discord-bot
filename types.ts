@@ -193,31 +193,24 @@ export enum ChannelType {
   GUILD_STAGE_VOICE,
 }
 
-export type Interaction =
-  & {
-    id: bigint;
-    application_id: bigint;
-    guild_id?: bigint;
-    channel_id?: bigint;
-    member?: GuildMember;
-    user?: DiscordUser;
-    token: string;
-    version: number;
-    message?: Message;
-  }
-  & (
-    | { type: InteractionType.PING }
-    | {
-      type: InteractionType.APPLICATION_COMMAND;
-      data: ApplicationCommandData;
-    }
-    | {
-      type: InteractionType.APPLICATION_COMMAND_AUTOCOMPLETE;
-      data: Partial<ApplicationCommandData>;
-    }
-    | { type: InteractionType.MESSAGE_COMPONENT; data: MessageComponentData }
-    | { type: InteractionType.MODAL_SUBMIT; data: ModalSubmitData }
-  );
+export type Interaction<T = InteractionType> = {
+  id: bigint;
+  data: T extends InteractionType.APPLICATION_COMMAND ? ApplicationCommandData
+    : T extends InteractionType.APPLICATION_COMMAND_AUTOCOMPLETE
+      ? Partial<ApplicationCommandData>
+    : T extends InteractionType.MESSAGE_COMPONENT ? MessageComponentData
+    : T extends InteractionType.MODAL_SUBMIT ? ModalSubmitData
+    : never;
+  type: T;
+  application_id: bigint;
+  guild_id?: bigint;
+  channel_id?: bigint;
+  member?: GuildMember;
+  user?: DiscordUser;
+  token: string;
+  version: number;
+  message?: Message;
+};
 
 export type ApplicationCommandData = {
   id: bigint;

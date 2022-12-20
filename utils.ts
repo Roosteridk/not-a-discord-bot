@@ -6,6 +6,7 @@ import {
   InteractionResponse,
   InteractionResponseData,
   InteractionResponseType,
+  InteractionType,
   MessageFlags,
   SelectMenu,
   TextInput,
@@ -17,7 +18,7 @@ export type Command = CreateApplicationCommand & {
   name: string;
   description: string;
   exec(
-    interaction: Interaction,
+    interaction: Interaction<InteractionType.APPLICATION_COMMAND>,
     ...args: unknown[]
   ): Promise<InteractionResponse>;
   autocomplete?(
@@ -34,7 +35,7 @@ export type Component<T extends Button | SelectMenu | TextInput> =
   & {
     custom_id: string;
     exec(
-      interaction: Interaction,
+      interaction: Interaction<InteractionType.MESSAGE_COMPONENT>,
       ...args: unknown[]
     ): Promise<InteractionResponse>;
   };

@@ -7,7 +7,6 @@ import {
   InteractionResponseData,
   InteractionType,
 } from "./types.ts";
-import { Command, Component } from "./utils.ts";
 import { ed25519Verify } from "https://deno.land/x/polkadot@0.2.19/util-crypto/mod.ts";
 
 export default class Discord {
@@ -79,22 +78,13 @@ export default class Discord {
   handleInteraction(
     i: Interaction,
   ): Promise<InteractionResponse> {
-    switch (i.type) {
-      case InteractionType.APPLICATION_COMMAND:
-        return import(
-          `./commands/${i.data.name}.ts`
-        ).then((c: Command) => c.exec(i));
-      case InteractionType.MESSAGE_COMPONENT || InteractionType.MODAL_SUBMIT:
-        return import(
-          `./components/${i.data.custom_id}.ts`
-        ).then((c: Component<any>) => c.exec(i));
-      case InteractionType.APPLICATION_COMMAND_AUTOCOMPLETE:
-        return import(
-          `./commands/${i.data.name}.ts`
-        ).then((c: Command) => c.autocomplete!(i));
-      default:
-        throw new Error("Unknown interaction type");
+    const response: InteractionResponse = {
+      type: 4,
+      data: {
+        content: "This is the default handler. You should modify it to your own needs.",
+      },
     }
+    return Promise.resolve(response);
   }
 
   // REST API methods
