@@ -8,9 +8,9 @@ import {
   InteractionResponseData,
   InteractionType,
 } from "./types.ts";
-import nacl from "npm:tweetnacl";
+import * as ed from "npm:@noble/ed25519";
 
-export default class Discord {
+export class Discord {
   publicKey: string;
   applicationId: string;
   private token: string;
@@ -44,7 +44,7 @@ export default class Discord {
       return new Response("Forbidden", { status: 403 });
     }
     const enc = new TextEncoder();
-    const isVerified = nacl.sign.detached.verify(
+    const isVerified = ed.verify(
       enc.encode(timestamp + message),
       enc.encode(signature),
       enc.encode(this.publicKey),
