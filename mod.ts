@@ -8,7 +8,7 @@ import {
   InteractionResponseData,
   InteractionType,
 } from "./types.ts";
-import { verifyOneShot } from "https://deno.land/std@0.170.0/node/internal/crypto/sig.ts";
+import nacl from "npm:tweetnacl";
 
 export default class Discord {
   publicKey: string;
@@ -44,11 +44,10 @@ export default class Discord {
       return new Response("Forbidden", { status: 403 });
     }
     const enc = new TextEncoder();
-    const isVerified = verifyOneShot(
-      "Ed25519",
+    const isVerified = nacl.sign.detached.verify(
       enc.encode(timestamp + message),
-      this.publicKey,
-      enc.encode(signature)
+      enc.encode(signature),
+      enc.encode(this.publicKey),
     );
     if (!isVerified) {
       return new Response("Invalid request signature", { status: 401 });
