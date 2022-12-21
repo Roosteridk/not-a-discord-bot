@@ -479,6 +479,20 @@ export type Message = {
   position?: number;
 };
 
+export type CreateMessage = {
+  content?: string;
+  nonce?: string;
+  tts?: boolean;
+  embeds?: Embed[];
+  allowed_mentions?: AllowedMentions;
+  //message_reference?: MessageReference;
+  components?: ActionRow[];
+  sticker_ids?: bigint[];
+  files?: File[];
+  attachments?: Attachment[];
+  flags?: number;
+};
+
 export enum MessageFlags {
   CROSSPOSTED = 1 << 0,
   IS_CROSSPOST = 1 << 1,

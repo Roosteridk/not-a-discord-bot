@@ -2,6 +2,7 @@ import {
   ApplicationCommand,
   Channel,
   CreateApplicationCommand,
+  CreateMessage,
   Interaction,
   InteractionResponse,
   InteractionResponseData,
@@ -138,12 +139,11 @@ export default class Discord {
    * @param channelId The channel to send the message to
    * @param content The content of the message
    */
-  async sendMessage(channelId: bigint, content: string) {
+  async sendMessage(channelId: bigint, msg: string | CreateMessage) {
+    const data = typeof msg === "string" ? { content: msg } : msg;
     return await this.fetch(`channels/${channelId}/messages`, {
       method: "POST",
-      body: JSON.stringify({
-        content: content,
-      }),
+      body: JSON.stringify({ data }),
     });
   }
   /**
