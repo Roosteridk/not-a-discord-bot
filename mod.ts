@@ -13,7 +13,7 @@ import { ed25519Verify } from "https://deno.land/x/polkadot@0.2.19/util-crypto/m
 export default class Discord {
   publicKey: string;
   applicationId: string;
-  private auth: Headers;
+  private token: string;
   private readonly discordApiUrl = "https://discord.com/api/v10/";
 
   /** The parameters are the same as the ones in the Discord Developer Portal */
@@ -26,9 +26,7 @@ export default class Discord {
   ) {
     this.publicKey = publicKey;
     this.applicationId = applicationId;
-    this.auth = new Headers({
-      "Authorization": "Bot " + token,
-    });
+    this.token = token;
   }
 
   /**
@@ -100,8 +98,8 @@ export default class Discord {
     const res = await fetch(this.discordApiUrl + endpoint, {
       ...options,
       headers: {
-        ...this.auth,
-        ...options?.headers,
+        "Authorization": "Bot " + this.token,
+        "Content-Type": "application/json",
       },
     });
 
@@ -113,25 +111,23 @@ export default class Discord {
   }
 
   /**
-   * Registers guild-scoped commands. This will overwrite any existing commands with the same name.
+   * Clears all commands and registers the new commands
    * @param guildId The guild to register the command in
    * @param commands The command(s) to register
    * @returns The registered command(s)
    */
-  registerGuildCommands(
-    guildId: bigint,
+  async bulkOverwriteGuildCommands(
+    guildId: string,
     commands: CreateApplicationCommand[],
   ) {
-    return Promise.all(commands.map(async (c) => {
-      const res = await this.fetch(
-        `applications/${this.applicationId}/guilds/${guildId}/commands`,
-        {
-          method: "POST",
-          body: JSON.stringify(c),
-        },
-      );
-      return await res.json() as ApplicationCommand;
-    }));
+    const res = await this.fetch(
+      `applications/${this.applicationId}/guilds/${guildId}/commands`,
+      {
+        method: "PUT",
+        body: JSON.stringify(commands),
+      },
+    );
+    return await res.json() as ApplicationCommand;
   }
 
   /**
@@ -139,7 +135,7 @@ export default class Discord {
    * @param channelId The channel to send the message to
    * @param content The content of the message
    */
-  async sendMessage(channelId: bigint, msg: string | CreateMessage) {
+  async sendMessage(channelId: string, msg: string | CreateMessage) {
     const data = typeof msg === "string" ? { content: msg } : msg;
     return await this.fetch(`channels/${channelId}/messages`, {
       method: "POST",
@@ -151,7 +147,7 @@ export default class Discord {
    * @param userId The user to create a DM channel with
    * @returns The channel object
    */
-  async createDM(userId: bigint): Promise<Channel> {
+  async createDM(userId: string): Promise<Channel> {
     const res = await this.fetch(`users/${userId}/channels`, {
       method: "POST",
     });
@@ -175,7 +171,7 @@ export default class Discord {
   /**
    * Adds a role to a guild member. Requires the `MANAGE_ROLES` permission.
    */
-  async giveRole(userId: bigint, guildId: bigint, roleId: bigint) {
+  async giveRole(userId: string, guildId: string, roleId: string) {
     return await this.fetch(
       `guilds/${guildId}/members/${userId}/roles/${roleId}`,
       {
