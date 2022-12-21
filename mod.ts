@@ -81,9 +81,10 @@ export default class Discord {
     const response: InteractionResponse = {
       type: 4,
       data: {
-        content: "This is the default handler. You should modify it to your own needs.",
+        content:
+          "This is the default handler. You should modify it to your own needs.",
       },
-    }
+    };
     return Promise.resolve(response);
   }
 

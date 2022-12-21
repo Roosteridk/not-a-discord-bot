@@ -219,7 +219,7 @@ export type MessageInteraction = {
   name: string;
   user: DiscordUser;
   member?: Partial<GuildMember>;
-}
+};
 
 export type ApplicationCommandData = {
   id: bigint;
