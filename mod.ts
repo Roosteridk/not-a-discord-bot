@@ -8,7 +8,7 @@ import {
   InteractionResponseData,
   InteractionType,
 } from "./types.ts";
-import { verify } from "https://raw.githubusercontent.com/paulmillr/noble-ed25519/main/mod.ts";
+import { verifyOneShot } from "https://deno.land/std@0.170.0/node/internal/crypto/sig.ts";
 
 export default class Discord {
   publicKey: string;
@@ -43,13 +43,13 @@ export default class Discord {
     if (signature === null || timestamp === null) {
       return new Response("Forbidden", { status: 403 });
     }
-
-    const isVerified = await verify(
-      timestamp + message,
-      signature,
+    const enc = new TextEncoder();
+    const isVerified = verifyOneShot(
+      "Ed25519",
+      enc.encode(timestamp + message),
       this.publicKey,
+      enc.encode(signature)
     );
-
     if (!isVerified) {
       return new Response("Invalid request signature", { status: 401 });
     }
