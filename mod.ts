@@ -138,7 +138,7 @@ export default class Discord {
    * @param channelId The channel to send the message to
    * @param content The content of the message
    */
-  async sendMessage(channelId: string, content: string) {
+  async sendMessage(channelId: bigint, content: string) {
     return await this.fetch(`channels/${channelId}/messages`, {
       method: "POST",
       body: JSON.stringify({
@@ -151,7 +151,7 @@ export default class Discord {
    * @param userId The user to create a DM channel with
    * @returns The channel object
    */
-  async createDM(userId: string): Promise<Channel> {
+  async createDM(userId: bigint): Promise<Channel> {
     const res = await this.fetch(`users/${userId}/channels`, {
       method: "POST",
     });
