@@ -163,7 +163,7 @@ export class Discord {
 
   async editOriginalInteractionResponse(
     interactionToken: string,
-    msg: Message,
+    msg: CreateMessage,
   ) {
     return await this.fetch(
       `webhooks/${this.applicationId}/${interactionToken}/messages/@original`,
