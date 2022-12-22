@@ -1,5 +1,5 @@
 export type Application = {
-  id: bigint;
+  id: string;
   name: string;
   icon: string | null;
   description: string;
@@ -10,17 +10,17 @@ export type Application = {
   privacy_policy_url?: string;
   owner?: DiscordUser;
   verify_key: string;
-  guild_id?: bigint;
-  primary_sku_id?: bigint;
+  guild_id?: string;
+  primary_sku_id?: string;
   slug?: string;
   cover_image?: string;
 };
 
 export type ApplicationCommand = {
-  id: bigint;
+  id: string;
   type: ApplicationCommandTypes;
-  application_id: bigint;
-  guild_id?: bigint;
+  application_id: string;
+  guild_id?: string;
   name: string;
   name_localizations?: Localization;
   description: string;
@@ -32,7 +32,7 @@ export type ApplicationCommand = {
   default_permission?: boolean;
   nsfw?: boolean;
   /** Autoincrementing version identifier updated during substantial record changes */
-  version: bigint;
+  version: string;
 };
 
 export type CreateApplicationCommand = {
@@ -58,7 +58,7 @@ export type Localization = {
 };
 
 export type PermissionString = {
-  id: bigint;
+  id: string;
   type: PermissionType;
   permission: boolean;
 };
@@ -194,7 +194,7 @@ export enum ChannelType {
 }
 
 export type Interaction<T = InteractionType> = {
-  id: bigint;
+  id: string;
   data: T extends InteractionType.APPLICATION_COMMAND ? ApplicationCommandData
     : T extends InteractionType.APPLICATION_COMMAND_AUTOCOMPLETE
       ? Partial<ApplicationCommandData>
@@ -202,9 +202,9 @@ export type Interaction<T = InteractionType> = {
     : T extends InteractionType.MODAL_SUBMIT ? ModalSubmitData
     : never;
   type: T;
-  application_id: bigint;
-  guild_id?: bigint;
-  channel_id?: bigint;
+  application_id: string;
+  guild_id?: string;
+  channel_id?: string;
   member?: GuildMember;
   user?: DiscordUser;
   token: string;
@@ -214,7 +214,7 @@ export type Interaction<T = InteractionType> = {
 
 /**This is sent on the message object when the message is a response to an Application Command Interaction without an existing message. */
 export type MessageInteraction = {
-  id: bigint;
+  id: string;
   type: InteractionType.MESSAGE_COMPONENT;
   name: string;
   user: DiscordUser;
@@ -222,7 +222,7 @@ export type MessageInteraction = {
 };
 
 export type ApplicationCommandData = {
-  id: bigint;
+  id: string;
   name: string;
   type: ApplicationCommandType;
   resolved?: InteractionDataResolved;
@@ -336,13 +336,13 @@ export type Embed = {
 
 export type AllowedMentions = {
   parse?: string[];
-  roles?: bigint[];
-  users?: bigint[];
+  roles?: string[];
+  users?: string[];
   replied_user?: boolean;
 };
 
 export type Attachment = {
-  id: bigint;
+  id: string;
   filename: string;
   content_type?: string;
   size: number;
@@ -353,7 +353,7 @@ export type Attachment = {
 };
 
 export type DiscordUser = {
-  id: bigint;
+  id: string;
   username: string;
   discriminator: string;
   avatar: string;
@@ -381,7 +381,7 @@ export type GuildMember = {
 };
 
 export type DiscordRole = {
-  id: bigint;
+  id: string;
   name: string;
   color: number;
   hoist: boolean;
@@ -392,23 +392,23 @@ export type DiscordRole = {
 };
 
 export type Channel = {
-  id: bigint;
+  id: string;
   type: ChannelType;
-  guild_id?: bigint;
+  guild_id?: string;
   position?: number;
   permission_overwrites?: PermissionsOverwrite[];
   name?: string;
   topic?: string;
   nsfw?: boolean;
-  last_message_id?: bigint;
+  last_message_id?: string;
   bitrate?: number;
   user_limit?: number;
   rate_limit_per_user?: number;
   recipients?: DiscordUser[];
   icon?: string;
-  owner_id?: bigint;
-  application_id?: bigint;
-  parent_id?: bigint;
+  owner_id?: string;
+  application_id?: string;
+  parent_id?: string;
   last_pin_timestamp?: string;
   rtc_region?: string;
   video_quality_mode?: number;
@@ -420,7 +420,7 @@ export type Channel = {
 };
 
 export type PermissionsOverwrite = {
-  id: bigint;
+  id: string;
   type: number;
   allow: string;
   deny: string;
@@ -434,21 +434,21 @@ export type ThreadMetadata = {
 };
 
 export type ThreadMember = {
-  id: bigint;
-  user_id: bigint;
+  id: string;
+  user_id: string;
   join_timestamp: string;
   flags: number;
 };
 
 export type Emoji = {
-  id?: bigint;
+  id?: string;
   name?: string;
   animated?: boolean;
 };
 
 export type Message = {
-  id: bigint;
-  channel_id: bigint;
+  id: string;
+  channel_id: string;
   author: DiscordUser;
   content: string;
   timestamp: string;
@@ -463,11 +463,11 @@ export type Message = {
   //reactions?: Reaction[];
   nonce?: string;
   pinned: boolean;
-  webhook_id?: bigint;
+  webhook_id?: string;
   type: number;
   //activity?: MessageActivity;
   application?: Partial<Application>;
-  application_id?: bigint;
+  application_id?: string;
   //message_reference?: MessageReference;
   flags?: number;
   referenced_message?: Message;
@@ -487,7 +487,7 @@ export type CreateMessage = {
   allowed_mentions?: AllowedMentions;
   //message_reference?: MessageReference;
   components?: ActionRow[];
-  sticker_ids?: bigint[];
+  sticker_ids?: string[];
   files?: File[];
   attachments?: Attachment[];
   flags?: number;
