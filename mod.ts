@@ -5,7 +5,6 @@ import {
   CreateMessage,
   Interaction,
   InteractionResponse,
-  Message,
   InteractionType,
 } from "./types.ts";
 import * as ed from "npm:@noble/ed25519";
