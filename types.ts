@@ -233,7 +233,7 @@ export type MessageComponentData = {
   custom_id: string;
   component_type: number;
   /**This is always present for select menu components */
-  values?: SelectOptionValue[];
+  values?: string[];
 };
 
 export type SelectOptionValue = {
