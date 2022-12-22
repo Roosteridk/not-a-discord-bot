@@ -38,19 +38,19 @@ export type ApplicationCommand = {
 export type CreateApplicationCommand = {
   name: string;
   /** Localization object for the `name` field. Values follow the same restrictions as `name` */
-  nameLocalizations?: Localization;
+  name_localizations?: Localization;
   /** 1-100 character description */
   description: string;
   /** Localization object for the `description` field. Values follow the same restrictions as `description` */
-  descriptionLocalizations?: Localization;
+  description_localizations?: Localization;
   /** Type of command, defaults `ApplicationCommandTypes.ChatInput` if not set  */
   type?: ApplicationCommandTypes;
   /** Parameters for the command */
   options?: ApplicationCommandOption[];
   /** Set of permissions represented as a bit set */
-  defaultMemberPermissions?: PermissionString[];
+  default_member_permissions?: PermissionString[];
   /** Indicates whether the command is available in DMs with the app, only for globally-scoped commands. By default, commands are visible. */
-  dmPermission?: boolean;
+  dm_permission?: boolean;
 };
 
 export type Localization = {
@@ -123,6 +123,8 @@ export enum ComponentType {
   ChannelSelect,
 }
 
+export type MessageComponent = Button | SelectMenu | TextInput;
+
 /**An Action Row is a non-interactive container component for other types of components. */
 export type ActionRow = {
   type: ComponentType.ActionRow;
@@ -194,10 +196,10 @@ export enum ChannelType {
 }
 
 export type Interaction<T = InteractionType> = {
-  id: string;
-  data: T extends InteractionType.APPLICATION_COMMAND ? ApplicationCommandData
+id: string;
+  data: T extends InteractionType.APPLICATION_COMMAND ? ApplicationCommandData<CreateApplicationCommand> 
     : T extends InteractionType.APPLICATION_COMMAND_AUTOCOMPLETE
-      ? Partial<ApplicationCommandData>
+      ? Partial<ApplicationCommandData<CreateApplicationCommand>>
     : T extends InteractionType.MESSAGE_COMPONENT ? MessageComponentData
     : T extends InteractionType.MODAL_SUBMIT ? ModalSubmitData
     : never;
@@ -221,12 +223,13 @@ export type MessageInteraction = {
   member?: Partial<GuildMember>;
 };
 
-export type ApplicationCommandData = {
+/**This is sent on the message object when the message is a response to an Application Command Interaction with an existing message. */
+export type ApplicationCommandData<T extends CreateApplicationCommand> = {
   id: string;
-  name: string;
-  type: ApplicationCommandType;
+  name: T['name'];
+  type: T['type'];
   resolved?: InteractionDataResolved;
-  options?: ApplicationCommandInteractionDataOption[];
+  options?: T['options'];
 };
 
 export type MessageComponentData = {
