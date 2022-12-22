@@ -44,7 +44,7 @@ export class Discord {
       return new Response("Forbidden", { status: 403 });
     }
 
-    const isVerified = ed.verify(
+    const isVerified = await ed.verify(
       signature,
       new TextEncoder().encode(timestamp + message),
       this.publicKey,
