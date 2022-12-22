@@ -5,7 +5,7 @@ import {
   CreateMessage,
   Interaction,
   InteractionResponse,
-  InteractionResponseData,
+  Message,
   InteractionType,
 } from "./types.ts";
 import * as ed from "npm:@noble/ed25519";
@@ -163,13 +163,13 @@ export class Discord {
 
   async editOriginalInteractionResponse(
     interactionToken: string,
-    response: InteractionResponse,
+    msg: Message,
   ) {
     return await this.fetch(
       `webhooks/${this.applicationId}/${interactionToken}/messages/@original`,
       {
         method: "PATCH",
-        body: JSON.stringify(response),
+        body: JSON.stringify(msg),
       },
     );
   }
