@@ -232,7 +232,16 @@ export type ApplicationCommandData = {
 export type MessageComponentData = {
   custom_id: string;
   component_type: number;
-  values?: string[];
+  /**This is always present for select menu components */
+  values?: SelectOptionValue[];
+};
+
+export type SelectOptionValue = {
+  label: string;
+  value: string;
+  description?: string;
+  emoji?: Partial<Emoji>;
+  default?: boolean;
 };
 
 export type ModalSubmitData = {
