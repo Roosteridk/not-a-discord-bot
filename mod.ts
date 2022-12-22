@@ -65,8 +65,11 @@ export class Discord {
 
     try {
       const res = await this.handleInteraction(data);
-      console.log(res)
-      return new Response(JSON.stringify(res), { status: 200 });
+      console.log(res);
+      return new Response(JSON.stringify(res), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      });
     } catch (e) {
       console.error(e);
       return new Response("Internal server error", { status: 500 });
