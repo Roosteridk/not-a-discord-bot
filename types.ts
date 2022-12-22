@@ -123,8 +123,6 @@ export enum ComponentType {
   ChannelSelect,
 }
 
-export type MessageComponent = Button | SelectMenu | TextInput;
-
 /**An Action Row is a non-interactive container component for other types of components. */
 export type ActionRow = {
   type: ComponentType.ActionRow;
@@ -196,10 +194,10 @@ export enum ChannelType {
 }
 
 export type Interaction<T = InteractionType> = {
-id: string;
-  data: T extends InteractionType.APPLICATION_COMMAND ? ApplicationCommandData<CreateApplicationCommand> 
+  id: string;
+  data: T extends InteractionType.APPLICATION_COMMAND ? ApplicationCommandData
     : T extends InteractionType.APPLICATION_COMMAND_AUTOCOMPLETE
-      ? Partial<ApplicationCommandData<CreateApplicationCommand>>
+      ? Partial<ApplicationCommandData>
     : T extends InteractionType.MESSAGE_COMPONENT ? MessageComponentData
     : T extends InteractionType.MODAL_SUBMIT ? ModalSubmitData
     : never;
@@ -223,13 +221,12 @@ export type MessageInteraction = {
   member?: Partial<GuildMember>;
 };
 
-/**This is sent on the message object when the message is a response to an Application Command Interaction with an existing message. */
-export type ApplicationCommandData<T extends CreateApplicationCommand> = {
+export type ApplicationCommandData = {
   id: string;
-  name: T['name'];
-  type: T['type'];
+  name: string;
+  type: ApplicationCommandType;
   resolved?: InteractionDataResolved;
-  options?: T['options'];
+  options?: ApplicationCommandInteractionDataOption[];
 };
 
 export type MessageComponentData = {
