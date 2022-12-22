@@ -162,14 +162,14 @@ export class Discord {
   }
 
   async editOriginalInteractionResponse(
-    token: string,
-    data: InteractionResponseData,
+    interactionToken: string,
+    response: InteractionResponse,
   ) {
     return await this.fetch(
-      `webhooks/${this.applicationId}/${token}/messages/@original`,
+      `webhooks/${this.applicationId}/${interactionToken}/messages/@original`,
       {
         method: "PATCH",
-        body: JSON.stringify(data),
+        body: JSON.stringify(response),
       },
     );
   }
