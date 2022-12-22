@@ -169,9 +169,7 @@ export class Discord {
       `webhooks/${this.applicationId}/${token}/messages/@original`,
       {
         method: "PATCH",
-        body: JSON.stringify({
-          data,
-        }),
+        body: JSON.stringify(data),
       },
     );
   }
