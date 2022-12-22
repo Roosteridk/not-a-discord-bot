@@ -65,6 +65,7 @@ export class Discord {
 
     try {
       const res = await this.handleInteraction(data);
+      console.log(res)
       return new Response(JSON.stringify(res), { status: 200 });
     } catch (e) {
       console.error(e);
