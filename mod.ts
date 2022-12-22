@@ -43,20 +43,24 @@ export class Discord {
     if (signature === null || timestamp === null) {
       return new Response("Forbidden", { status: 403 });
     }
-    const enc = new TextEncoder();
+
     const isVerified = ed.verify(
-      enc.encode(timestamp + message),
-      enc.encode(signature),
-      enc.encode(this.publicKey),
+      signature,
+      new TextEncoder().encode(timestamp + message),
+      this.publicKey,
     );
     if (!isVerified) {
       return new Response("Invalid request signature", { status: 401 });
     }
 
-    const data = await req.json() as Interaction;
+    const data = JSON.parse(message) as Interaction;
     // Handle PING which is used by Discord to verify the endpoint
     if (data.type === InteractionType.PING) {
-      return new Response(JSON.stringify({ type: 1 }), { status: 200 });
+      console.log("PING from Discord!");
+      return new Response(JSON.stringify({ type: 1 }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
     try {
