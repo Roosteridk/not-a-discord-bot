@@ -54,7 +54,7 @@ export function EphemeralResponse(
     type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
     data: {
       ...data,
-      flags: MessageFlags.EPHEMERAL,
+      flags: data.flags ? data.flags | MessageFlags.EPHEMERAL : MessageFlags.EPHEMERAL,
     },
   };
 }
