@@ -14,20 +14,22 @@ import {
 
 // These are utility functions and types that you can use in your code to help you write your commands and components
 
-export type Command = CreateApplicationCommand & {
-  name: string;
-  description: string;
+interface CommandOptions extends CreateApplicationCommand {
   exec(
     interaction: Interaction<InteractionType.APPLICATION_COMMAND>,
     ...args: unknown[]
-  ): Promise<InteractionResponse>;
-  autocomplete?(
-    interaction: Interaction,
-    ...args: unknown[]
-  ): Promise<InteractionResponse>;
-};
+  ): void;
+}
+// Waiting for https://github.com/microsoft/TypeScript/issues/5326
+// deno-lint-ignore no-empty-interface
+export interface Command extends CommandOptions {}
+export class Command {
+  constructor(options: CommandOptions) {
+    Object.assign(this, options);
+  }
+}
 
-// If I use interface insttead of type, I get an error. Why? I don't know. I'm not a typescript expert. This further blurs the line between types and interfaces.
+// If I use interface insttead of type, I get an error. Why? I don't know. I'm not a typescript expert... This further blurs the line between types and interfaces.
 export type Component<T = Button | SelectMenu | TextInput> =
   & {
     [P in keyof T]: T[P];
@@ -40,6 +42,7 @@ export type Component<T = Button | SelectMenu | TextInput> =
     ): Promise<InteractionResponse>;
   };
 
+// Might remove this idk
 export function EphemeralResponse(
   message: InteractionResponseData | string,
 ): InteractionResponse {
@@ -54,7 +57,9 @@ export function EphemeralResponse(
     type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
     data: {
       ...data,
-      flags: data.flags ? data.flags | MessageFlags.EPHEMERAL : MessageFlags.EPHEMERAL,
+      flags: data.flags
+        ? data.flags | MessageFlags.EPHEMERAL
+        : MessageFlags.EPHEMERAL,
     },
   };
 }

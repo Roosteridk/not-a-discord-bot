@@ -1,4 +1,4 @@
-export type Application = {
+export type Application = Readonly<{
   id: string;
   name: string;
   icon: string | null;
@@ -8,34 +8,15 @@ export type Application = {
   bot_require_code_grant: boolean;
   terms_of_service_url?: string;
   privacy_policy_url?: string;
-  owner?: DiscordUser;
+  owner?: User;
   verify_key: string;
   guild_id?: string;
   primary_sku_id?: string;
   slug?: string;
   cover_image?: string;
-};
+}>;
 
 export type ApplicationCommand = {
-  id: string;
-  type: ApplicationCommandTypes;
-  application_id: string;
-  guild_id?: string;
-  name: string;
-  name_localizations?: Localization;
-  description: string;
-  description_localizations?: Localization;
-  options?: ApplicationCommandOption[];
-  dm_permission?: boolean;
-  default_member_permissions?: PermissionString[];
-  dm_member_permissions?: PermissionString[];
-  default_permission?: boolean;
-  nsfw?: boolean;
-  /** Autoincrementing version identifier updated during substantial record changes */
-  version: string;
-};
-
-export type CreateApplicationCommand = {
   name: string;
   /** Localization object for the `name` field. Values follow the same restrictions as `name` */
   name_localizations?: Localization;
@@ -51,7 +32,20 @@ export type CreateApplicationCommand = {
   default_member_permissions?: PermissionString[];
   /** Indicates whether the command is available in DMs with the app, only for globally-scoped commands. By default, commands are visible. */
   dm_permission?: boolean;
+  id: string;
+  application_id: string;
+  guild_id?: string;
+  dm_member_permissions?: PermissionString[];
+  default_permission?: boolean;
+  nsfw?: boolean;
+  /** Autoincrementing version identifier updated during substantial record changes */
+  version: string;
 };
+
+export type NewApplicationCommand = Pick<
+  ApplicationCommand,
+  "name" | "description" | "options" | "default_permission"
+>;
 
 export type Localization = {
   [key: string]: string;
@@ -63,12 +57,12 @@ export type PermissionString = {
   permission: boolean;
 };
 
-export enum PermissionType {
+export const enum PermissionType {
   ROLE = 1,
   USER,
 }
 
-export enum ApplicationCommandTypes {
+export const enum ApplicationCommandTypes {
   ChatInput = 1,
   User,
   Message,
@@ -87,7 +81,7 @@ export type ApplicationCommandOption = {
   autocomplete?: boolean;
 };
 
-export enum ApplicationCommandOptionType {
+export const enum ApplicationCommandOptionType {
   SUB_COMMAND = 1,
   SUB_COMMAND_GROUP,
   STRING,
@@ -101,7 +95,7 @@ export enum ApplicationCommandOptionType {
   ATTACHMENT,
 }
 
-export enum ApplicationCommandType {
+export const enum ApplicationCommandType {
   CHAT_INPUT = 1,
   USER,
   MESSAGE,
@@ -112,7 +106,7 @@ export type ApplicationCommandOptionChoice = {
   value: string | number;
 };
 
-export enum ComponentType {
+export const enum ComponentType {
   ActionRow = 1,
   Button,
   StringSelect,
@@ -129,7 +123,7 @@ export type ActionRow = {
   components: (Button | SelectMenu | TextInput)[];
 };
 
-export enum ButtonStyle {
+export const enum ButtonStyle {
   Primary = 1,
   Secondary,
   Success,
@@ -147,21 +141,27 @@ export type Button = {
   disabled?: boolean;
 };
 
-export type SelectMenu = {
-  type:
-    | ComponentType.ChannelSelect
-    | ComponentType.MentionableSelect
-    | ComponentType.RoleSelect
-    | ComponentType.StringSelect
-    | ComponentType.UserSelect;
-  custom_id: string;
-  options: SelectMenuOption[];
-  placeholder?: string;
-  min_values?: number;
-  max_values?: number;
-  disabled?: boolean;
-  channel_types?: ChannelType[];
-};
+export type SelectMenu =
+  & {
+    type:
+      | ComponentType.ChannelSelect
+      | ComponentType.MentionableSelect
+      | ComponentType.RoleSelect
+      | ComponentType.StringSelect
+      | ComponentType.UserSelect;
+    custom_id: string;
+    placeholder?: string;
+    min_values?: number;
+    max_values?: number;
+    disabled?: boolean;
+  }
+  & ({
+    type: ComponentType.ChannelSelect;
+    channel_types: ChannelType[];
+  } | {
+    type: ComponentType.StringSelect;
+    options: SelectMenuOption[];
+  });
 
 export type SelectMenuOption = {
   label: string;
@@ -179,7 +179,7 @@ export type TextInput = {
   max_length?: number;
 };
 
-export enum ChannelType {
+export const enum ChannelType {
   GUILD_TEXT = 0,
   DM,
   GUILD_VOICE,
@@ -193,7 +193,7 @@ export enum ChannelType {
   GUILD_STAGE_VOICE,
 }
 
-export type Interaction<T = InteractionType> = {
+export type Interaction<T = InteractionType> = Readonly<{
   id: string;
   data: T extends InteractionType.APPLICATION_COMMAND ? ApplicationCommandData
     : T extends InteractionType.APPLICATION_COMMAND_AUTOCOMPLETE
@@ -206,18 +206,18 @@ export type Interaction<T = InteractionType> = {
   guild_id?: string;
   channel_id?: string;
   member?: GuildMember;
-  user?: DiscordUser;
+  user?: User;
   token: string;
   version: number;
   message?: Message;
-};
+}>;
 
 /**This is sent on the message object when the message is a response to an Application Command Interaction without an existing message. */
 export type MessageInteraction = {
   id: string;
   type: InteractionType.MESSAGE_COMPONENT;
   name: string;
-  user: DiscordUser;
+  user: User;
   member?: Partial<GuildMember>;
 };
 
@@ -231,7 +231,7 @@ export type ApplicationCommandData = {
 
 export type MessageComponentData = {
   custom_id: string;
-  component_type: number;
+  component_type: ComponentType;
   /**This is always present for select menu components */
   values?: string[];
 };
@@ -246,14 +246,14 @@ export type SelectOptionValue = {
 
 export type ModalSubmitData = {
   custom_id: string;
-  component_type: number;
+  component_type: ComponentType;
   values?: string[];
 };
 
 export type InteractionDataResolved = {
-  users?: DiscordUser[];
+  users?: User[];
   members?: GuildMember[];
-  roles?: DiscordRole[];
+  roles?: Role[];
   channels?: Channel[];
 };
 
@@ -264,7 +264,7 @@ export type ApplicationCommandInteractionDataOption = {
   options?: ApplicationCommandInteractionDataOption[];
 };
 
-export enum InteractionType {
+export const enum InteractionType {
   PING = 1,
   APPLICATION_COMMAND,
   MESSAGE_COMPONENT,
@@ -272,7 +272,7 @@ export enum InteractionType {
   MODAL_SUBMIT,
 }
 
-export enum InteractionResponseType {
+export const enum InteractionResponseType {
   PONG = 1,
   CHANNEL_MESSAGE_WITH_SOURCE = 4,
   DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE,
@@ -287,15 +287,19 @@ export type InteractionResponse = {
   data?: InteractionResponseData;
 };
 
-export type InteractionResponseData = {
-  tts?: boolean;
-  content?: string;
-  embeds?: Embed[];
-  allowed_mentions?: AllowedMentions;
-  flags?: number;
-  components?: ActionRow[];
-  attachments?: Attachment[];
-};
+export type InteractionResponseData = Partial<
+  Pick<
+    // sheesh
+    Message,
+    | "content"
+    | "embeds"
+    | "allowed_mentions"
+    | "flags"
+    | "components"
+    | "attachments"
+    | "tts"
+  >
+>;
 
 export type Embed = {
   title?: string;
@@ -361,7 +365,7 @@ export type Attachment = {
   width?: number;
 };
 
-export type DiscordUser = {
+export type User = {
   id: string;
   username: string;
   discriminator: string;
@@ -378,9 +382,9 @@ export type DiscordUser = {
 };
 
 export type GuildMember = {
-  user?: DiscordUser;
+  user?: User;
   nick?: string;
-  roles: DiscordRole[];
+  roles: Role[];
   joined_at: string;
   premium_since?: string;
   deaf: boolean;
@@ -389,7 +393,7 @@ export type GuildMember = {
   permissions?: string;
 };
 
-export type DiscordRole = {
+export type Role = {
   id: string;
   name: string;
   color: number;
@@ -413,7 +417,7 @@ export type Channel = {
   bitrate?: number;
   user_limit?: number;
   rate_limit_per_user?: number;
-  recipients?: DiscordUser[];
+  recipients?: User[];
   icon?: string;
   owner_id?: string;
   application_id?: string;
@@ -458,14 +462,14 @@ export type Emoji = {
 export type Message = {
   id: string;
   channel_id: string;
-  author: DiscordUser;
+  author: User;
   content: string;
   timestamp: string;
   edited_timestamp?: string;
   tts: boolean;
   mention_everyone: boolean;
-  mentions: DiscordUser[];
-  mention_roles: DiscordRole[];
+  mentions: User[];
+  mention_roles: Role[];
   //mention_channels?: ChannelMention[];
   attachments: Attachment[];
   embeds: Embed[];
@@ -486,23 +490,22 @@ export type Message = {
   //sticker_items?: StickerItem[];
   //stickers?: Sticker[];
   position?: number;
-};
-
-export type CreateMessage = {
-  content?: string;
-  nonce?: string;
-  tts?: boolean;
-  embeds?: Embed[];
   allowed_mentions?: AllowedMentions;
-  //message_reference?: MessageReference;
-  components?: ActionRow[];
-  sticker_ids?: string[];
-  files?: File[];
-  attachments?: Attachment[];
-  flags?: number;
 };
 
-export enum MessageFlags {
+export type NewMessage = Pick<
+  Message,
+  | "content"
+  | "nonce"
+  | "tts"
+  | "embeds"
+  | "allowed_mentions"
+  | "components"
+  | "attachments"
+  | "flags"
+>;
+
+export const enum MessageFlags {
   CROSSPOSTED = 1 << 0,
   IS_CROSSPOST = 1 << 1,
   SUPPRESS_EMBEDS = 1 << 2,
