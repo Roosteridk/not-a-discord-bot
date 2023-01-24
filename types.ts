@@ -206,16 +206,15 @@ export const enum ChannelType {
   GUILD_STAGE_VOICE,
 }
 
-export type Interaction = ({
-  type: InteractionType.PING;
-} | {
-  type: InteractionType.APPLICATION_COMMAND;
-  data: ApplicationCommandData;
-} | {
-  type: InteractionType.MESSAGE_COMPONENT;
-  data: MessageComponentData;
-}) & {
+export type Interaction<T = InteractionType> = Readonly<{
   id: string;
+  data: T extends InteractionType.APPLICATION_COMMAND ? ApplicationCommandData
+    : T extends InteractionType.APPLICATION_COMMAND_AUTOCOMPLETE
+      ? Partial<ApplicationCommandData>
+    : T extends InteractionType.MESSAGE_COMPONENT ? MessageComponentData
+    : T extends InteractionType.MODAL_SUBMIT ? ModalSubmitData
+    : never;
+  type: T;
   application_id: string;
   guild_id?: string;
   channel_id?: string;
@@ -224,7 +223,7 @@ export type Interaction = ({
   token: string;
   version: number;
   message?: Message;
-};
+}>;
 
 /**This is sent on the message object when the message is a response to an Application Command Interaction without an existing message. */
 export type MessageInteraction = {
@@ -246,9 +245,8 @@ export type ApplicationCommandData = {
 export type MessageComponentData = {
   custom_id: string;
   component_type: ComponentType;
-} & {
-  component_type: ComponentType.StringSelect;
-  values: string[];
+  /**This is always present for select menu components */
+  values?: string[];
 };
 
 export type SelectOptionValue = {
