@@ -42,7 +42,7 @@ export type ApplicationCommand = {
   version: string;
 };
 
-export type NewApplicationCommand = Pick<
+export type ApplicationCommandInit = Pick<
   ApplicationCommand,
   "name" | "description" | "options" | "default_permission"
 >;
@@ -105,6 +105,19 @@ export type ApplicationCommandOptionChoice = {
   name: string;
   value: string | number;
 };
+
+export type GuildApplicationCommandPermissions = {
+  id: string;
+  application_id: string;
+  guild_id: string;
+  permissions: ApplicationCommandPermission[];
+}
+
+export type ApplicationCommandPermission = {
+  id: string;
+  type: number;
+  permission: boolean;
+}
 
 export const enum ComponentType {
   ActionRow = 1,
@@ -289,7 +302,6 @@ export type InteractionResponse = {
 
 export type InteractionResponseData = Partial<
   Pick<
-    // sheesh
     Message,
     | "content"
     | "embeds"
@@ -493,7 +505,7 @@ export type Message = {
   allowed_mentions?: AllowedMentions;
 };
 
-export type NewMessage = Pick<
+export type MessageInit = Pick<
   Message,
   | "content"
   | "nonce"

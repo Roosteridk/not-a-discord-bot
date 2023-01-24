@@ -2,10 +2,12 @@ import * as Discord from "./types.ts";
 import { crypto_check } from "https://deno.land/x/monocypher@v3.1.2-4/mod.ts";
 
 export * from "./types.ts";
-export default abstract class DiscordAPI {
-  static readonly baseURL = "https://discord.com/api/v10/";
+export default abstract class DiscordApp {
+  static readonly baseURL = "https://discord.com/api/v10";
+  private botInstance?: DiscordApp["Bot"]["prototype"];
 
-  constructor(private publicKey: string) {
+  constructor(private id: string, private publicKey: string) {
+    this.id = id;
     this.publicKey = publicKey;
   }
 
@@ -65,43 +67,126 @@ export default abstract class DiscordAPI {
    */
   abstract interactionHandler(interaction: Discord.Interaction): Discord.InteractionResponse | Promise<Discord.InteractionResponse>;
 
+  setBot(token: string) {
+    this.botInstance = new this.Bot(token);
+    return this.botInstance;
+  }
+
+  get bot() {
+    if (!this.botInstance) throw new Error("Use setBot() to set a bot token first");
+    return this.botInstance;
+  }
+
   // REST API
 
-  static Interaction = class {
-    constructor(private appId: string, private token: string) {
-      this.appId = appId;
+  private async commandFetch(endpoint: string, options?: RequestInit) {
+    const res = await fetch(`${DiscordApp.baseURL}/applications/${this.id}/commands/${endpoint}/`, options);
+    if (!res.ok) throw new Error(res.statusText);
+    return res;
+  }
+
+  async getCommands() {
+    const res = await this.commandFetch("");
+    return await res.json() as Discord.ApplicationCommand[];
+  }
+
+  async createGlobalCommand(command: Discord.ApplicationCommandInit) {
+    const res = await this.commandFetch("", {
+      method: "POST",
+      body: JSON.stringify(command),
+    });
+    return await res.json() as Discord.ApplicationCommand;
+  }
+
+  async getGlobalCommand(commandId: string) {
+    const res = await this.commandFetch(`${commandId}`);
+    return await res.json() as Discord.ApplicationCommand;
+  }
+
+  async editGlobalCommand(commandId: string, command: Discord.ApplicationCommandInit) {
+    const res = await this.commandFetch(`${commandId}`, {
+      method: "PATCH",
+      body: JSON.stringify(command),
+    });
+    return await res.json() as Discord.ApplicationCommand;
+  }
+
+  async deleteGlobalCommand(commandId: string) {
+    await this.commandFetch(`${commandId}`, {
+      method: "DELETE",
+    });
+  }
+
+  async bulkOverwriteGlobalCommands(commands: Discord.ApplicationCommandInit[]) {
+    const res = await this.commandFetch("", {
+      method: "PUT",
+      body: JSON.stringify(commands),
+    });
+    return await res.json() as Discord.ApplicationCommand[];
+  }
+
+  async getGuildCommands(guildId: string) {
+    const res = await this.commandFetch(`guilds/${guildId}/commands`);
+    return await res.json() as Discord.ApplicationCommand[];
+  }
+
+  async createGuildCommand(guildId: string, command: Discord.ApplicationCommandInit) {
+    const res = await this.commandFetch(`guilds/${guildId}/commands`, {
+      method: "POST",
+      body: JSON.stringify(command),
+    });
+    return await res.json() as Discord.ApplicationCommand;
+  }
+
+  async getGuildCommand(guildId: string, commandId: string) {
+    const res = await this.commandFetch(`guilds/${guildId}/commands/${commandId}`);
+    return await res.json() as Discord.ApplicationCommand;
+  }
+
+  async editGuildCommand(guildId: string, commandId: string, command: Discord.ApplicationCommandInit) {
+    const res = await this.commandFetch(`guilds/${guildId}/commands/${commandId}`, {
+      method: "PATCH",
+      body: JSON.stringify(command),
+    });
+    return await res.json() as Discord.ApplicationCommand;
+  }
+
+  async deleteGuildCommand(guildId: string, commandId: string) {
+    await this.commandFetch(`guilds/${guildId}/commands/${commandId}`, {
+      method: "DELETE",
+    });
+  }
+
+  async bulkOverwriteGuildCommands(
+    guildId: string,
+    commands: Discord.ApplicationCommandInit[],
+  ) {
+    const res = await this.commandFetch(`guilds/${guildId}/commands`, {
+      method: "PUT",
+      body: JSON.stringify(commands),
+    });
+    return await res.json() as Discord.ApplicationCommand[];
+  }
+
+  async getGuildCommandPermissions(guildId: string) {
+    const res = await this.commandFetch(`guilds/${guildId}/commands/permissions`);
+    return await res.json() as Discord.GuildApplicationCommandPermissions[];
+  }
+
+  Interaction = class {
+    constructor(private token: string) {
       this.token = token;
     }
 
     private async fetch(endpoint: string, options?: RequestInit) {
-      const res = await fetch(DiscordAPI.baseURL + endpoint, options);
+      const res = await fetch(`${DiscordApp.baseURL}/webhooks/${DiscordApp.prototype.id}/${this.token}/messages/${endpoint}/`, options);
       if (!res.ok) throw new Error(res.statusText);
       return res;
     }
 
-    /**
-     * Clear all commands and register the new commands
-     * @param guildId The guild to register the command in
-     * @param commands An array of commands to register
-     * @returns The registered commands
-     */
-    async bulkOverwriteGuildCommands(
-      guildId: string,
-      commands: Discord.NewApplicationCommand[],
-    ) {
+    async editOriginal(msg: Discord.InteractionResponseData) {
       const res = await this.fetch(
-        `${DiscordAPI.baseURL}/applications/${this.appId}/guilds/${guildId}/commands`,
-        {
-          method: "PUT",
-          body: JSON.stringify(commands),
-        },
-      );
-      return await res.json() as Discord.ApplicationCommand[];
-    }
-
-    async editOriginalInteractionResponse(msg: Discord.InteractionResponseData) {
-      const res = await this.fetch(
-        `${DiscordAPI.baseURL}/webhooks/${this.appId}/${this.token}/messages/@original`,
+        `@original`,
         {
           method: "PATCH",
           body: JSON.stringify(msg),
@@ -110,33 +195,56 @@ export default abstract class DiscordAPI {
       return await res.json() as Discord.Message;
     }
 
-    async deleteOriginalInteractionResponse() {
-      await this.fetch(
-        `${DiscordAPI.baseURL}/webhooks/${this.appId}/${this.token}/messages/@original`,
-        {
+    async deleteOriginal() {
+      await this.fetch(`@original`,{
           method: "DELETE",
         },
       );
     }
 
-    async getOriginalInteractionResponse() {
-      const res = await this.fetch(
-        `${DiscordAPI.baseURL}/webhooks/${this.appId}/${this.token}/messages/@original`,
+    async getOriginal() {
+      const res = await this.fetch(`@original`);
+      return await res.json() as Discord.Message;
+    }
+
+    async createFollowup(msg: Discord.InteractionResponseData) {
+      const res = await this.fetch("", {
+          method: "POST",
+          body: JSON.stringify(msg),
+        },
       );
+      return await res.json() as Discord.Message;
+    }
+
+    async editFollowup(msgId: string, msg: Discord.InteractionResponseData) {
+      const res = await this.fetch(`${msgId}`, {
+          method: "PATCH",
+          body: JSON.stringify(msg),
+        },
+      );
+      return await res.json() as Discord.Message;
+    }
+
+    async deleteFollowup(msgId: string) {
+      await this.fetch(`${msgId}`, {
+          method: "DELETE",
+        },
+      );
+    }
+
+    async getFollowup(msgId: string) {
+      const res = await this.fetch(`${msgId}`);
       return await res.json() as Discord.Message;
     }
   };
 
-  static Bot = class {
+  private Bot = class {
     constructor(private token: string) {
       this.token = token;
     }
 
-    /**
-     * Fetch wrapper for the Discord API endpoints that require bot authorization
-     */
     private async fetch(endpoint: string, options?: RequestInit) {
-      const res = await fetch(DiscordAPI.baseURL + endpoint, {
+      const res = await fetch(`${DiscordApp.baseURL}/${endpoint}/`, {
         ...options,
         headers: {
           "Authorization": "Bot " + this.token,
@@ -147,25 +255,15 @@ export default abstract class DiscordAPI {
       return res;
     }
 
-    /**
-     * Send a message to a channel
-     * @param channelId The id of the channel to send the message to
-     * @param msg The message to send
-     */
-    async sendMessage(channelId: string, msg: string | Discord.NewMessage) {
+    async sendMessage(channelId: string, msg: string | Discord.MessageInit) {
       const data = typeof msg === "string" ? { content: msg } : msg;
-      const res = await this.fetch(`channels/${channelId}/messages`, {
+      const res = await this.fetch(`channels/${channelId}/messages/`, {
         method: "POST",
         body: JSON.stringify({ data }),
       });
       return await res.json() as Discord.Message;
     }
 
-    /**
-     * Create a DM channel with a user
-     * @param userId The id of the user to create the DM with
-     * @returns A channel
-     */
     async createDM(userId: string) {
       const res = await this.fetch(`users/${userId}/channels`, {
         method: "POST",
@@ -173,19 +271,24 @@ export default abstract class DiscordAPI {
       return await res.json() as Discord.Channel;
     }
 
-    /**
-     * Add a role to a guild member. Requires the `MANAGE_ROLES` permission.
-     * @param userId The id of the user to add the role to
-     * @param guildId The id of the guild the user is in
-     */
-    async giveRole(userId: string, guildId: string, roleId: string) {
-      const res = await this.fetch(
-        `guilds/${guildId}/members/${userId}/roles/${roleId}`,
-        {
+    async addRole(userId: string, guildId: string, roleId: string) {
+      const res = await this.fetch(`guilds/${guildId}/members/${userId}/roles/${roleId}`,{
           method: "PUT",
         },
       );
       return await res.json() as Discord.Role;
+    }
+
+    async removeRole(userId: string, guildId: string, roleId: string) {
+      await this.fetch(`guilds/${guildId}/members/${userId}/roles/${roleId}`,{
+          method: "DELETE",
+        },
+      );
+    }
+
+    async getGuildMember(guildId: string, userId: string) {
+      const res = await this.fetch(`guilds/${guildId}/members/${userId}`);
+      return await res.json() as Discord.GuildMember;
     }
   };
 }
