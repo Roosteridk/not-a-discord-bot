@@ -2,7 +2,7 @@ import * as Discord from "./types.ts";
 import { crypto_check } from "https://deno.land/x/monocypher@v3.1.2-4/mod.ts";
 
 export * from "./types.ts";
-export abstract class DiscordApp {
+export default abstract class DiscordApp {
   static readonly baseURL = "https://discord.com/api/v10";
   private botInstance?: DiscordApp["Bot"]["prototype"];
 
