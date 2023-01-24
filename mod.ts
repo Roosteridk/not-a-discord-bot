@@ -2,9 +2,9 @@ import * as Discord from "./types.ts";
 import { crypto_check } from "https://deno.land/x/monocypher@v3.1.2-4/mod.ts";
 
 export * from "./types.ts";
-export abstract class DiscordApp {
+export default abstract class DiscordApp {
   static readonly baseURL = "https://discord.com/api/v10";
-  private botInstance?: DiscordApp["Bot"]["prototype"];
+  private botInstance?: typeof DiscordApp.Bot.prototype;
 
   constructor(private id: string, private publicKey: string) {
     this.id = id;
@@ -67,13 +67,13 @@ export abstract class DiscordApp {
    */
   abstract interactionHandler(interaction: Discord.Interaction): Discord.InteractionResponse | Promise<Discord.InteractionResponse>;
 
-  setBot(token: string) {
-    this.botInstance = new this.Bot(token);
+  createBot(token: string) {
+    this.botInstance = new DiscordApp.Bot(token);
     return this.botInstance;
   }
 
   get bot() {
-    if (!this.botInstance) throw new Error("Use setBot() to set a bot token first");
+    if (!this.botInstance) throw new Error("Use createBot() to set a bot token first");
     return this.botInstance;
   }
 
@@ -173,17 +173,17 @@ export abstract class DiscordApp {
     return await res.json() as Discord.GuildApplicationCommandPermissions[];
   }
 
-  Interaction = class {
-    constructor(private token: string) {
-      this.token = token;
-    }
+  // Interactions API
 
+  static WrappedInteraction = class WrappedInteraction {
+    constructor(private interaction: Discord.Interaction | Pick<Discord.Interaction, "token" | "application_id">) {}
+  
     private async fetch(endpoint: string, options?: RequestInit) {
-      const res = await fetch(`${DiscordApp.baseURL}/webhooks/${DiscordApp.prototype.id}/${this.token}/messages/${endpoint}/`, options);
+      const res = await fetch(`${DiscordApp.baseURL}/webhooks/${this.interaction.application_id}/${this.interaction.token}/messages/${endpoint}/`, options);
       if (!res.ok) throw new Error(res.statusText);
       return res;
     }
-
+  
     async editOriginal(msg: Discord.InteractionResponseData) {
       const res = await this.fetch(
         `@original`,
@@ -194,19 +194,19 @@ export abstract class DiscordApp {
       );
       return await res.json() as Discord.Message;
     }
-
+  
     async deleteOriginal() {
       await this.fetch(`@original`,{
           method: "DELETE",
         },
       );
     }
-
+  
     async getOriginal() {
       const res = await this.fetch(`@original`);
       return await res.json() as Discord.Message;
     }
-
+  
     async createFollowup(msg: Discord.InteractionResponseData) {
       const res = await this.fetch("", {
           method: "POST",
@@ -215,7 +215,7 @@ export abstract class DiscordApp {
       );
       return await res.json() as Discord.Message;
     }
-
+  
     async editFollowup(msgId: string, msg: Discord.InteractionResponseData) {
       const res = await this.fetch(`${msgId}`, {
           method: "PATCH",
@@ -224,21 +224,23 @@ export abstract class DiscordApp {
       );
       return await res.json() as Discord.Message;
     }
-
+  
     async deleteFollowup(msgId: string) {
       await this.fetch(`${msgId}`, {
           method: "DELETE",
         },
       );
     }
-
+  
     async getFollowup(msgId: string) {
       const res = await this.fetch(`${msgId}`);
       return await res.json() as Discord.Message;
     }
-  };
+  }
+  
+  // Bot API
 
-  private Bot = class {
+  static Bot = class Bot {
     constructor(private token: string) {
       this.token = token;
     }
