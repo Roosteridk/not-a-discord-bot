@@ -277,7 +277,7 @@ export type ApplicationCommandInteractionDataOption = {
   options?: ApplicationCommandInteractionDataOption[];
 };
 
-export const enum InteractionType {
+export enum InteractionType {
   PING = 1,
   APPLICATION_COMMAND,
   MESSAGE_COMPONENT,
