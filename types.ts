@@ -208,6 +208,13 @@ export const enum ChannelType {
 
 export type Interaction<T = InteractionType> = Readonly<{
   id: string;
+  data: T extends InteractionType.APPLICATION_COMMAND ? ApplicationCommandData
+    : T extends InteractionType.APPLICATION_COMMAND_AUTOCOMPLETE
+      ? Partial<ApplicationCommandData>
+    : T extends InteractionType.MESSAGE_COMPONENT ? MessageComponentData
+    : T extends InteractionType.MODAL_SUBMIT ? ModalSubmitData
+    : never;
+  type: T;
   application_id: string;
   guild_id?: string;
   channel_id?: string;
@@ -216,18 +223,7 @@ export type Interaction<T = InteractionType> = Readonly<{
   token: string;
   version: number;
   message?: Message;
-} & ({
-  type: T extends InteractionType.APPLICATION_COMMAND ? InteractionType.APPLICATION_COMMAND : never;
-  data: ApplicationCommandData;
-} | {
-  type: T extends InteractionType.MESSAGE_COMPONENT ? InteractionType.MESSAGE_COMPONENT : never;
-  data: MessageComponentData;
-} | {
-  type: T extends InteractionType.MODAL_SUBMIT ? InteractionType.MODAL_SUBMIT : never;
-  data: ModalSubmitData;
-} | {
-  type: InteractionType.PING;
-})>;
+}>;
 
 /**This is sent on the message object when the message is a response to an Application Command Interaction without an existing message. */
 export type MessageInteraction = {
