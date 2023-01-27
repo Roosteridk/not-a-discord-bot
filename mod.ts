@@ -2,9 +2,9 @@ import * as Discord from "./types.ts";
 import { crypto_check } from "https://deno.land/x/monocypher@v3.1.2-4/mod.ts";
 
 export * from "./types.ts";
-export default abstract class DiscordApp {
+export default abstract class DiscordApplication {
   static readonly baseURL = "https://discord.com/api/v10";
-  private botInstance?: typeof DiscordApp.Bot.prototype;
+  private botInstance?: typeof DiscordApplication.Bot.prototype;
 
   constructor(private id: string, private publicKey: string) {
     this.id = id;
@@ -68,7 +68,7 @@ export default abstract class DiscordApp {
   abstract interactionHandler(interaction: Discord.Interaction): Discord.InteractionResponse | Promise<Discord.InteractionResponse>;
 
   createBot(token: string) {
-    this.botInstance = new DiscordApp.Bot(token);
+    this.botInstance = new DiscordApplication.Bot(token);
     return this.botInstance;
   }
 
@@ -80,7 +80,7 @@ export default abstract class DiscordApp {
   // REST API
 
   private async commandFetch(endpoint: string, options?: RequestInit) {
-    const res = await fetch(`${DiscordApp.baseURL}/applications/${this.id}/commands/${endpoint}/`, options);
+    const res = await fetch(`${DiscordApplication.baseURL}/applications/${this.id}/commands/${endpoint}/`, options);
     if (!res.ok) throw new Error(res.statusText);
     return res;
   }
@@ -175,11 +175,13 @@ export default abstract class DiscordApp {
 
   // Interactions API
 
-  static WrappedInteraction = class WrappedInteraction {
-    constructor(private interaction: Discord.Interaction | Pick<Discord.Interaction, "token" | "application_id">) {}
+  static InteractionWrapper = class InteractionWrapper {
+    constructor(public readonly interaction: Discord.Interaction | Pick<Discord.Interaction, "token" | "application_id">) {
+      this.interaction = interaction;
+    }
   
     private async fetch(endpoint: string, options?: RequestInit) {
-      const res = await fetch(`${DiscordApp.baseURL}/webhooks/${this.interaction.application_id}/${this.interaction.token}/messages/${endpoint}/`, options);
+      const res = await fetch(`${DiscordApplication.baseURL}/webhooks/${this.interaction.application_id}/${this.interaction.token}/messages/${endpoint}/`, options);
       if (!res.ok) throw new Error(res.statusText);
       return res;
     }
@@ -246,7 +248,7 @@ export default abstract class DiscordApp {
     }
 
     private async fetch(endpoint: string, options?: RequestInit) {
-      const res = await fetch(`${DiscordApp.baseURL}/${endpoint}/`, {
+      const res = await fetch(`${DiscordApplication.baseURL}/${endpoint}/`, {
         ...options,
         headers: {
           "Authorization": "Bot " + this.token,

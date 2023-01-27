@@ -111,13 +111,13 @@ export type GuildApplicationCommandPermissions = {
   application_id: string;
   guild_id: string;
   permissions: ApplicationCommandPermission[];
-}
+};
 
 export type ApplicationCommandPermission = {
   id: string;
   type: number;
   permission: boolean;
-}
+};
 
 export const enum ComponentType {
   ActionRow = 1,
@@ -206,7 +206,7 @@ export const enum ChannelType {
   GUILD_STAGE_VOICE,
 }
 
-export type Interaction<T = InteractionType> = Readonly<{
+export type Interaction<T = InteractionType> = {
   id: string;
   data: T extends InteractionType.APPLICATION_COMMAND ? ApplicationCommandData
     : T extends InteractionType.APPLICATION_COMMAND_AUTOCOMPLETE
@@ -223,7 +223,7 @@ export type Interaction<T = InteractionType> = Readonly<{
   token: string;
   version: number;
   message?: Message;
-}>;
+};
 
 /**This is sent on the message object when the message is a response to an Application Command Interaction without an existing message. */
 export type MessageInteraction = {
